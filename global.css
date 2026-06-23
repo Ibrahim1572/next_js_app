@@ -1,0 +1,14 @@
+*{
+    font-family: 'Roboto Mono', monospace;
+}
+
+div{
+    font-size:32px;
+    color:chartreuse;
+    text-align: center;
+}
+
+
+form{
+    text-align: center;
+}
