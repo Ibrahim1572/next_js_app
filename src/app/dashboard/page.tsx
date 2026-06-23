@@ -24,7 +24,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ChartExample() {
+function Chart() {
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
       <BarChart accessibilityLayer data={chartData}>
@@ -34,3 +34,19 @@ export function ChartExample() {
     </ChartContainer>
   )
 }
+
+function Page(){
+    return(
+        <div className="min-h-screen">
+            <header>
+                <h1 className="border-red-500">This is a header</h1>
+            </header>
+            <footer>
+                <h1 className="border-green-600">This is a footer</h1>
+            </footer>
+        </div>
+    )
+}
+
+
+export default Page;
