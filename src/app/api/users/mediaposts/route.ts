@@ -40,3 +40,4 @@ export async function POST(request: NextRequest){
         return NextResponse.json({info: "Got error in post upload api route",message: error.message, status:500, success:false})
     }
 }
+
