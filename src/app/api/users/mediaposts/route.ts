@@ -41,3 +41,17 @@ export async function POST(request: NextRequest){
     }
 }
 
+export async function GET(){
+    await db_connection();
+    try {
+        const allPosts=await Posts.find({}).sort({updatedAt: -1}).limit(10)
+        if(!allPosts){
+            return NextResponse.json({info: "No posts, (DB is empty)", success:true})
+        }
+        return NextResponse.json({info: "Posts retrieved", success:true, posts: allPosts})
+    } 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (error:any) {
+        return NextResponse.json({info: "Got error in view all api route", message: error.message, status:500, success:false})
+    }
+}
