@@ -29,6 +29,6 @@ const postsSchema=mongoose.Schema({
 
 )
 
-const Posts= mongoose.models.post || mongoose.model("posts", postsSchema)
+const Posts= mongoose.models.posts || mongoose.model("posts", postsSchema)
 
 export default Posts
