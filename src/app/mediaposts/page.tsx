@@ -2,6 +2,8 @@
 import {useState} from 'react'
 import axios from 'axios'
 import {useRouter} from 'next/navigation'
+import { CartesianGrid, Legend, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { RechartsDevtools } from '@recharts/devtools';
 
 function Page(){
     const router=useRouter()
@@ -71,6 +73,16 @@ function Page(){
         const oldTitle = postDataOne?.postTitle 
         await axios.delete('/api/users/mediaposts/'+encodeURIComponent(oldTitle))
     }
+
+    const data = [
+    { name: 'Jan', uv: 4000 },
+    { name: 'Feb', uv: 3000 },
+    { name: 'Mar', uv: 2000 },
+    { name: 'Apr', uv: 2780 },
+    { name: 'May', uv: 1890 },
+    { name: 'Jun', uv: 2390 },
+    { name: 'Jul', uv: 3490 },
+    ];
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stateJSX=()=>{
@@ -274,7 +286,7 @@ function Page(){
                     </>
                     
                 )
-            default : 
+            case 'addPost' : 
                 return(
                     <form action={addPost} className="flex flex-col space-y-5 justify-center items-center" >
                     <h1>Add a Post</h1>
@@ -313,6 +325,26 @@ function Page(){
                     </button>
                 </form>
                 )
+
+            default:
+                return (
+                    <>
+                        <h1 className='p-4'>sample chart</h1>
+                        <LineChart style={{ width: '100%', aspectRatio: 1.618, maxWidth: 600 }} responsive data={data} margin={{
+                            top: 20,
+                            right: 20,
+                            bottom: 5,
+                            left: 0,
+                        }}>
+                            <CartesianGrid stroke="#aaaaaa" strokeDasharray="5 5" />
+                            <Line type="monotone" dataKey="uv" stroke="purple" strokeWidth={2} name="My data series name" />
+                            <XAxis dataKey="name" />
+                            <YAxis width="auto" label={{ value: 'UV', position: 'insideLeft', angle: -90 }} />
+                            <Legend align="right" />
+                            <RechartsDevtools />
+                        </LineChart>
+                    </>
+                )
         }
     }
 
@@ -334,6 +366,7 @@ function Page(){
 
 
             <header className='flex flex-row '>
+                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('dashboard'); }}>Dashboard</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('addPost'); }}>Add Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewOne'); }}>View One Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll()}}>View All Posts</div>
