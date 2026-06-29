@@ -43,15 +43,34 @@ function Page(){
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const searchPost=async(formData: any)=>{
-        // setPostDataOne({})
         const searchTitle=formData.get('title')
         const temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle))
-        // console.log(typeof(temp.data.posts))
         setPostDataOne(temp.data.post)
-        // console.log(typeof(temp.data.posts))
-        // return 
+        
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updatePost=async(formData: any)=>{
+        if (!postDataOne) return;
+        
+        const data={
+            newPostTitle: formData.get('newTitle'), 
+            newPostBody: formData.get('newBody')
+        }
+        // Change '.title' to '.postTitle' to match your schema
+        const oldTitle = postDataOne?.postTitle 
+        
+        // Note: If your backend endpoint uses PUT for updates, change .post to .put
+        await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle), data)
+        
+        // Reset view or clean up
+        setCurrentView("")
+        setPostDataOne(null)
     }
 
+    const deletePost=async()=>{
+        const oldTitle = postDataOne?.postTitle 
+        await axios.delete('/api/users/mediaposts/'+encodeURIComponent(oldTitle))
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stateJSX=()=>{
@@ -83,16 +102,13 @@ function Page(){
                         </form>
 
                     
-                                    {/* <div className='p-4 outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
-                                        <h3 className="text-xl font-bold mb-2">{item.postTitle}</h3>
-                                        <p className="text-sm text-slate-300 font-normal">{item.postBody}</p>
-                                    </div> */}
+                                    
                     </header>
                     <div className='flex justify-center items-center w-full p-4'>
                         {postDataOne ? (
                             <div key={postDataOne._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
-                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne.postTitle}</h3>
-                                <p className="text-base text-slate-300 font-normal">{postDataOne.postBody}</p>
+                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne?.postTitle}</h3>
+                                <p className="text-base text-slate-300 font-normal">{postDataOne?.postBody}</p>
                                 
                                 {/* Optional: Add metadata fields if you want to show them */}
                                 <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
@@ -135,7 +151,7 @@ function Page(){
                     <>
                     <header>
                         <form action={searchPost} className="flex flex-col space-y-5 justify-center items-center" >
-                            <h1>Search a Post</h1>
+                            <h1>Update a Post</h1>
                             <div>
                             <label className="block text-sm font-medium text-slate-300 mb-1">
                                Enter Post title:
@@ -155,24 +171,48 @@ function Page(){
                             </button>
                         </form>
 
-                    
-                                    {/* <div className='p-4 outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
-                                        <h3 className="text-xl font-bold mb-2">{item.postTitle}</h3>
-                                        <p className="text-sm text-slate-300 font-normal">{item.postBody}</p>
-                                    </div> */}
                     </header>
                     <div className='flex justify-center items-center w-full p-4'>
                         {postDataOne ? (
-                            <div key={postDataOne._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
-                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne.postTitle}</h3>
-                                <p className="text-base text-slate-300 font-normal">{postDataOne.postBody}</p>
+                            <form action={updatePost}>
+                            <div key={postDataOne?._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                <h1>Old Post</h1>
+                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne?.postTitle}</h3>
+                                <p className="text-base text-slate-300 font-normal">{postDataOne?.postBody}</p>
                                 
                                 {/* Optional: Add metadata fields if you want to show them */}
                                 <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
-                                    <span>Likes: {postDataOne.postLikes}</span>
-                                    <span>Created: {new Date(postDataOne.createdAt).toLocaleDateString()}</span>
+                                    <span>Likes: {postDataOne?.postLikes}</span>
+                                    <span>Created: {new Date(postDataOne?.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">
+                                    Enter new Post title:
+                                    </label>
+                                    <input 
+                                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        placeholder="new title" 
+                                        required 
+                                        name="newTitle"
+                                    />
+                                <label className="block text-sm font-medium text-slate-300 mb-1">
+                                    Enter new Post body:
+                                    </label>
+                                    <input 
+                                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        placeholder="new body" 
+                                        required 
+                                        name="newBody"
+                                    />
+                                <button
+                                    type="submit"
+                                    className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                                >
+                                    Update
+                                </button>
+                            </div>
+                            </form>
                         ) : (
                             <div className="text-center text-slate-400 font-normal">No post found</div>
                         )}
@@ -181,7 +221,59 @@ function Page(){
                     
                                 )
             case 'deletePost':
-                return(<h1>deletePost</h1>)
+                return (
+                    <>
+                    <header>
+                        <form action={searchPost} className="flex flex-col space-y-5 justify-center items-center" >
+                            <h1>Delete a Post</h1>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                               Enter Post title:
+                            </label>
+                            <input 
+                                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                placeholder="title" 
+                                required 
+                                name="title"
+                            />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                            >
+                                Search
+                            </button>
+                        </form>
+
+                    </header>
+                    <div className='flex justify-center items-center w-full p-4'>
+                        {postDataOne ? (
+                            <form action={deletePost}>
+                            <div key={postDataOne?._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                <h1>Post</h1>
+                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne?.postTitle}</h3>
+                                <p className="text-base text-slate-300 font-normal">{postDataOne?.postBody}</p>
+                                
+                                {/* Optional: Add metadata fields if you want to show them */}
+                                <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
+                                    <span>Likes: {postDataOne?.postLikes}</span>
+                                    <span>Created: {new Date(postDataOne?.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                            >
+                                Delete Permanently
+                            </button>
+                            </form>
+                        ) : (
+                            <div className="text-center text-slate-400 font-normal">No post found</div>
+                        )}
+                    </div>
+                    </>
+                    
+                )
             default : 
                 return(
                     <form action={addPost} className="flex flex-col space-y-5 justify-center items-center" >
