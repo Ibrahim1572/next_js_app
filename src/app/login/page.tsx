@@ -1,14 +1,22 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import { useSession, signIn } from 'next-auth/react'
 
 function Page() {
+    const { data: session, status } = useSession()
     const router = useRouter()
     const [user, setUser] = useState({
         password: "",
         email: ""
     })
+
+    useEffect(function() {
+        if (session) {
+            router.push('/mediaposts')
+        }
+    }, [session, router])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onSignUp = async (formData: any) => {
@@ -24,6 +32,14 @@ function Page() {
 
     function goToSignUp() {
         router.push('/signup')
+    }
+
+    if (status === "loading") {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-400 font-sans">
+                Checking authentication...
+            </div>
+        )
     }
 
     return (
@@ -74,7 +90,21 @@ function Page() {
                         Log In
                     </button>
                 </form>
+                <div className="relative flex py-3 items-center">
+                    <div className="flex-grow border-t border-slate-700"></div>
+                    <span className="flex-shrink mx-4 text-slate-500 text-xs uppercase">Or continue with</span>
+                    <div className="flex-grow border-t border-slate-700"></div>
+                </div>
 
+                <div className="mt-1">
+                    <button 
+                        type="button"
+                        onClick={function() { signIn('github') }}
+                        className="w-full py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white font-semibold rounded-lg shadow-md transition duration-200 flex items-center justify-center gap-2"
+                    >
+                        Sign In with GitHub
+                    </button>
+                </div>
                 {/* Divider & Secondary Action */}
                 <div className="mt-8 text-center border-t border-slate-700 pt-6">
                     <p className="text-sm text-slate-400 mb-3">Don't have an account?</p>

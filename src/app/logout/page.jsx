@@ -5,7 +5,7 @@ import {useRouter} from 'next/navigation'
 
 function Page(){
     const router=useRouter()
-    const onSignUp = async (formData) =>{
+    const onLogOut = async (formData) =>{
         const data={
             username: "",
             email: "",
@@ -17,15 +17,56 @@ function Page(){
         router.push('/login')
     }
 
+   
+    
+    const goToMediaPosts= async()=>{
+        router.push("/mediaposts")
+        }
+
+    const goToProfilePage=async()=>{
+        router.push('/profile')
+    }
+
+
+    // return (
+    //     <>
+    //         <div>sign out page</div>
+    //         <form action={onSignUp}>
+    //             <button type='submit'>LogOut</button>
+    //         </form>
+
+    //     </>
+    // )
 
     return (
-        <>
-            <div>sign out page</div>
-            <form action={onSignUp}>
-                <button type='submit'>LogOut</button>
-            </form>
+        <div className="p-8 flex flex-col gap-4 bg-slate-900 min-h-screen text-white">
+            <div>Signout Page</div>
+                    
 
-        </>
+            <div className="flex gap-4">
+                {/* Fixed border classes by adding 'border-b-2' */}
+                <button 
+                    className='border-b-2 border-b-amber-600 px-4 py-2 rounded bg-amber-600/10 hover:bg-amber-600/20 transition' 
+                    onClick={onLogOut}
+                >
+                    Logout
+                </button>
+                
+                <button 
+                    className='border-b-2 border-b-green-500 px-4 py-2 rounded bg-green-500/10 hover:bg-green-500/20 transition' 
+                    onClick={goToProfilePage}
+                >
+                    Go to profile Page
+                </button>
+
+                <button 
+                    className='border-b-2 border-b-green-500 px-4 py-2 rounded bg-red-500/10 hover:bg-red-500/20 transition' 
+                    onClick={goToMediaPosts}
+                >
+                    Go to Media Posts Dashboard
+                </button>
+            </div>
+        </div>
     )
 }
 

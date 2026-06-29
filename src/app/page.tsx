@@ -1,11 +1,14 @@
 'use client'
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { getServerSession } from "next-auth/next"
+
 
 
 
 export default function Home() {
   const router=useRouter();
+  
   function GoToLoginPage() {
     router.push("/login")
   }

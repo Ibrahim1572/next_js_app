@@ -18,8 +18,14 @@ function Page(){
     const goToSignOut= async()=>{
         router.push("/logout")
     }
-    const response = axios.post("/api/users/profile")
-    console.log(response)
+    const response1 = axios.post("/api/users/profile")
+    console.log(response1)
+
+    const goToMediaPosts= async()=>{
+        router.push("/logout")
+    }
+    const response2 = axios.post("/api/users/mediaposts")
+    console.log(response2)
     
 
     return (
@@ -48,6 +54,13 @@ function Page(){
                     onClick={getData}
                 >
                     Get User Data
+                </button>
+
+                <button 
+                    className='border-b-2 border-b-green-500 px-4 py-2 rounded bg-red-500/10 hover:bg-red-500/20 transition' 
+                    onClick={goToMediaPosts}
+                >
+                    Go to Media Posts Dashboard
                 </button>
             </div>
         </div>

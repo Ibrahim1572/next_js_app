@@ -9,12 +9,16 @@ export function middleware(request: NextRequest) {
   const token=request.cookies.get('token')?.value || ""
   // console.log("-------------------------------------------------")
   // console.log(isPathPublic)
+  const nextAuthToken = request.cookies.get('next-auth.session-token')?.value || request.cookies.get('__Secure-next-auth.session-token')?.value || ""
 
-  if (isPathPublic&&token) {
+  // A session is valid if either the custom token or the OAuth token exists
+  const hasValidSession = token || nextAuthToken
+
+  if (isPathPublic&&hasValidSession) {
       return NextResponse.redirect(new URL('/', request.url))
   }
 
-  if(!isPathPublic&&!token){
+  if(!isPathPublic&&!hasValidSession){
     return NextResponse.redirect(new URL('/login', request.url))
   }
   
