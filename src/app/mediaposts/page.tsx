@@ -21,6 +21,8 @@ function Page(){
 
     const [postData, setPostData]=useState([])
     const [currentView, setCurrentView]=useState("")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [postDataOne, setPostDataOne]=useState<any>(null)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const addPost=async(formData: any)=>{
@@ -36,18 +38,17 @@ function Page(){
     const viewAll=async()=>{
         setPostData([])
         const temp=await axios.get('/api/users/mediaposts')
-        console.log(typeof(temp.data.posts))
         setPostData(temp.data.posts)
-        console.log(typeof(temp.data.posts))
         // return 
     }
-
-    const viewOne=async(searchTitle: string)=>{
-        setPostData([])
-        const temp=await axios.get('/api/users/mediaposts/'+searchTitle)
-        console.log(typeof(temp.data.posts))
-        setPostData(temp.data.posts)
-        console.log(typeof(temp.data.posts))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const searchPost=async(formData: any)=>{
+        // setPostDataOne({})
+        const searchTitle=formData.get('title')
+        const temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle))
+        // console.log(typeof(temp.data.posts))
+        setPostDataOne(temp.data.post)
+        // console.log(typeof(temp.data.posts))
         // return 
     }
 
@@ -57,7 +58,55 @@ function Page(){
         switch (currentView){
 
             case 'viewOne':
-                return(<h1>viewOne</h1>)
+                return (
+                    <>
+                    <header>
+                        <form action={searchPost} className="flex flex-col space-y-5 justify-center items-center" >
+                            <h1>Search a Post</h1>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                               Enter Post title:
+                            </label>
+                            <input 
+                                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                placeholder="title" 
+                                required 
+                                name="title"
+                            />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                            >
+                                Search
+                            </button>
+                        </form>
+
+                    
+                                    {/* <div className='p-4 outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                        <h3 className="text-xl font-bold mb-2">{item.postTitle}</h3>
+                                        <p className="text-sm text-slate-300 font-normal">{item.postBody}</p>
+                                    </div> */}
+                    </header>
+                    <div className='flex justify-center items-center w-full p-4'>
+                        {postDataOne ? (
+                            <div key={postDataOne._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne.postTitle}</h3>
+                                <p className="text-base text-slate-300 font-normal">{postDataOne.postBody}</p>
+                                
+                                {/* Optional: Add metadata fields if you want to show them */}
+                                <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
+                                    <span>Likes: {postDataOne.postLikes}</span>
+                                    <span>Created: {new Date(postDataOne.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center text-slate-400 font-normal">No post found</div>
+                        )}
+                    </div>
+                    </>
+                    
+                                )
             case 'viewAll':
                 return(
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 justify-center items-center w-full p-4'>
@@ -68,7 +117,12 @@ function Page(){
                                     <div key={item._id} className='p-4 outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
                                         <h3 className="text-xl font-bold mb-2">{item.postTitle}</h3>
                                         <p className="text-sm text-slate-300 font-normal">{item.postBody}</p>
+                                        <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
+                                            <span>Likes: {item.postLikes}</span>
+                                            <span>Created: {new Date(item.createdAt).toLocaleDateString()}</span>
+                                        </div>
                                     </div>
+                                    
                                 )
                             })
                         ) : (
@@ -77,7 +131,55 @@ function Page(){
                     </div>
                 )
             case 'updatePost':
-                return(<h1>updatePost</h1>)
+                return (
+                    <>
+                    <header>
+                        <form action={searchPost} className="flex flex-col space-y-5 justify-center items-center" >
+                            <h1>Search a Post</h1>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                               Enter Post title:
+                            </label>
+                            <input 
+                                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                placeholder="title" 
+                                required 
+                                name="title"
+                            />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                            >
+                                Search
+                            </button>
+                        </form>
+
+                    
+                                    {/* <div className='p-4 outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                        <h3 className="text-xl font-bold mb-2">{item.postTitle}</h3>
+                                        <p className="text-sm text-slate-300 font-normal">{item.postBody}</p>
+                                    </div> */}
+                    </header>
+                    <div className='flex justify-center items-center w-full p-4'>
+                        {postDataOne ? (
+                            <div key={postDataOne._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne.postTitle}</h3>
+                                <p className="text-base text-slate-300 font-normal">{postDataOne.postBody}</p>
+                                
+                                {/* Optional: Add metadata fields if you want to show them */}
+                                <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
+                                    <span>Likes: {postDataOne.postLikes}</span>
+                                    <span>Created: {new Date(postDataOne.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center text-slate-400 font-normal">No post found</div>
+                        )}
+                    </div>
+                    </>
+                    
+                                )
             case 'deletePost':
                 return(<h1>deletePost</h1>)
             default : 

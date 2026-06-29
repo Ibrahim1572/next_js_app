@@ -19,7 +19,7 @@ function Page() {
         const response = await axios.post("/api/users/login", data)
         console.log("Signup success:", response.data)
         alert("Logged in successfully!")
-        router.push('/profile')
+        router.push('/mediaposts')
     }
 
     function goToSignUp() {
