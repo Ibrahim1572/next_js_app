@@ -4,6 +4,8 @@ import User from '@/models/userModels';
 import { NextResponse, NextRequest } from 'next/server';
 import {jwtDecode} from 'jwt-decode'
 import {cookies} from 'next/headers'
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
 
 export async function POST(request: NextRequest){
     await db_connection();
@@ -12,24 +14,53 @@ export async function POST(request: NextRequest){
         const {title, body}= reqBody;
 
         const cookieStore=cookies();
-        const tokenCookie=(await cookieStore).get('token')
+        let tokenCookie=(await cookieStore).get('token')
+        let cookieType="jwt"
+        let extractedUserEmail=""
+
+        if(!tokenCookie){
+            tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+            cookieType="nextAuth"
+        }
+        if(!tokenCookie){
+            tokenCookie=(await cookieStore).get('next-auth.session-token')
+            cookieType="nextAuth"
+        }
         
         if (!tokenCookie) {
-            return NextResponse.json({ message: "Token cookie not found" }, { status: 401 });                }
+            cookieType=""
+            return NextResponse.json({ message: "Token cookie not found" }, { status: 401 });   
+        }
+                    
         
-        const tokenValue = tokenCookie.value;
-        
-        const decodedToken= jwtDecode(tokenValue);
-        const extractedUserId = decodedToken.id;
-
-        console.log(extractedUserId)
-        console.log(typeof extractedUserId)
-        const id= await User.findById(extractedUserId)
-        if(!id){
-            return NextResponse.json({message: "only existing users can post", status: 401})
+        if(cookieType==='jwt'){
+            const tokenValue = tokenCookie.value;
+            const decodedToken= jwtDecode(tokenValue);
+            extractedUserEmail = decodedToken.email;
         }
 
-        const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": extractedUserId})
+        if(cookieType==='nextAuth'){
+            const session = await getServerSession(authOptions);
+            console.log(`session: ${session}`)
+            // console.log(`session value: ${session.value}`)
+            console.log(`session user: ${session.user}`)
+            console.log(`Stringified Session: ${JSON.stringify(session, null, 2)}`);
+            console.log(`session user email: ${session.user.email}`)
+            if (session && session.user && session.user.email) {
+                extractedUserEmail = session.user.email;
+                }
+        }
+        // console.log(`decoded Token: ${decodedToken}`)
+        // console.log(`extracted user Id: ${extractedUserId}`)
+
+        // console.log(extractedUserId)
+        // console.log(typeof extractedUserId)
+        // const id= await User.findById(extractedUserId)
+        // if(!id){
+        //     return NextResponse.json({message: "only existing users can post", status: 401})
+        // }
+
+        const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": extractedUserEmail})
         const savedPost=await newPost.save()
         
         return NextResponse.json({post: savedPost, success:true, message:"Post added", status:201})

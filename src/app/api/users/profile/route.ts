@@ -12,7 +12,14 @@ export async function POST(request: NextRequest){
     try {console.log("------------------------------------------------------------------------")
 
         const cookieStore=cookies();
-        const tokenCookie=(await cookieStore).get('token')
+        let tokenCookie=(await cookieStore).get('token')
+        
+        if(!tokenCookie){
+            tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+        }
+        if(!tokenCookie){
+            tokenCookie=(await cookieStore).get('next-auth.session-token')
+        }
 
         if (!tokenCookie) {
             return NextResponse.json({ message: "Token cookie not found" }, { status: 401 });

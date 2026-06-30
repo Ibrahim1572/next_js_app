@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
   const hasValidSession = token || nextAuthToken
 
   if (isPathPublic&&hasValidSession) {
-      return NextResponse.redirect(new URL('/', request.url))
+      return NextResponse.redirect(new URL('/mediaposts', request.url))
   }
 
   if(!isPathPublic&&!hasValidSession){

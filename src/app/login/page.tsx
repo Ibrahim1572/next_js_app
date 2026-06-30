@@ -19,7 +19,7 @@ function Page() {
     }, [session, router])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const onSignUp = async (formData: any) => {
+    const onSignIn = async (formData: any) => {
         const data = {
             email: formData.get('email'),
             password: formData.get('password')
@@ -27,7 +27,8 @@ function Page() {
         const response = await axios.post("/api/users/login", data)
         console.log("Signup success:", response.data)
         alert("Logged in successfully!")
-        router.push('/mediaposts')
+        window.location.href = '/mediaposts';
+
     }
 
     function goToSignUp() {
@@ -52,7 +53,7 @@ function Page() {
                 </h1>
 
                 {/* Form area using space-y to automatically gap the inputs */}
-                <form action={onSignUp} className="flex flex-col space-y-5">
+                <form action={onSignIn} className="flex flex-col space-y-5">
                     
                     {/* Email Input Group */}
                     <div>

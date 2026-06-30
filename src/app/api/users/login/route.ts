@@ -24,8 +24,11 @@ export async function POST(request: NextRequest){
 
 
         const tokenData={
-            id: dbUser._id
+            id: dbUser._id,
+            email: dbUser.email
         }
+        console.log(`dbUser: ${dbUser}`)
+        console.log(`token data: ${tokenData}`)
         const tk_secret=process.env.SECRET_TOKEN || "Ibrahim";
         console.log(`Secret key= ${tk_secret}`)
         const token= jwt.sign(tokenData, tk_secret, {expiresIn: '1d'})

@@ -22,7 +22,7 @@ function Page(){
     console.log(response1)
 
     const goToMediaPosts= async()=>{
-        router.push("/logout")
+        router.push("/mediaposts")
     }
     const response2 = axios.post("/api/users/mediaposts")
     console.log(response2)
@@ -33,12 +33,15 @@ function Page(){
             <div>Profile Page</div>
             
             {/* Displaying the data if it exists */}
-            {userData && (
+            {userData? (
                 <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
                     <p><strong>Email:</strong> {userData.email}</p>
                     <p><strong>ID:</strong> {userData._id}</p>
                 </div>
-            )}
+            ):(<div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                    <p><strong>Users Logged in with github can not be fetched</strong></p>
+                    
+                </div>)}
 
             <div className="flex gap-4">
                 {/* Fixed border classes by adding 'border-b-2' */}

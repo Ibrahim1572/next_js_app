@@ -35,7 +35,14 @@ export async function DELETE(request :NextRequest, context: RouteParams){
     try {
         //get user details
         const cookieStore=cookies();
-        const tokenCookie=(await cookieStore).get('token')
+        let tokenCookie=(await cookieStore).get('token');
+        
+        if(!tokenCookie){
+            tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+        }
+        if(!tokenCookie){
+            tokenCookie=(await cookieStore).get('next-auth.session-token')
+        }
                 
         if (!tokenCookie) {
             return NextResponse.json({ message: "Token cookie not found, like user is not logged in" }, { status: 401 });                
@@ -83,7 +90,14 @@ export async function POST(request :NextRequest, context: RouteParams){
     try {
         //get user details
         const cookieStore=cookies();
-        const tokenCookie=(await cookieStore).get('token')
+        let tokenCookie=(await cookieStore).get('token')
+
+        if(!tokenCookie){
+            tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+        }
+        if(!tokenCookie){
+            tokenCookie=(await cookieStore).get('next-auth.session-token')
+        }
                 
         if (!tokenCookie) {
             return NextResponse.json({ message: "Token cookie not found, like user is not logged in" }, { status: 401 });                
