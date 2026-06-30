@@ -29,8 +29,8 @@ function Page(){
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const addPost=async(formData: any)=>{
         const data ={
-            title: formData.get('title'),
-            body: formData.get('body')
+            title: formData.get('title').trim(),
+            body: formData.get('body').trim()
         }
         const response=await axios.post('/api/users/mediaposts', data)
         setCurrentView("")
@@ -45,7 +45,7 @@ function Page(){
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const searchPost=async(formData: any)=>{
-        const searchTitle=formData.get('title')
+        const searchTitle=formData.get('title').trim()
         const temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle))
         setPostDataOne(temp.data.post)
         
@@ -55,8 +55,8 @@ function Page(){
         if (!postDataOne) return;
         
         const data={
-            newPostTitle: formData.get('newTitle'), 
-            newPostBody: formData.get('newBody')
+            newPostTitle: formData.get('newTitle').trim(), 
+            newPostBody: formData.get('newBody').trim()
         }
         // Change '.title' to '.postTitle' to match your schema
         const oldTitle = postDataOne?.postTitle 
@@ -325,7 +325,12 @@ function Page(){
                     </button>
                 </form>
                 )
+            case 'graphs':
+                return (
+                    <>
 
+                    </>
+                )
             default:
                 return (
                     <>
@@ -366,12 +371,13 @@ function Page(){
 
 
             <header className='flex flex-row '>
-                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('dashboard'); }}>Dashboard</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('dashboard'); }}>Analytic Dashboard</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('addPost'); }}>Add Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewOne'); }}>View One Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll()}}>View All Posts</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('updatePost');}}>Update Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Delete Post</div>
+                {/* <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('graphs');}}>Graphs</div> */}
             </header>
 
 

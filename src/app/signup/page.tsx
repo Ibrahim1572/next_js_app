@@ -13,9 +13,9 @@ function Page(){
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onSignUp = async (formData:any) =>{
         const data={
-            username: formData.get('username'),
-            email: formData.get('email'),
-            password: formData.get('password')
+            username: formData.get('username').trim(),
+            email: formData.get('email').trim(),
+            password: formData.get('password').trim()
         }
         const response = await axios.post("/api/users/signup", data)
         console.log("Signup success:", response.data)

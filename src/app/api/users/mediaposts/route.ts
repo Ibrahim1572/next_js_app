@@ -1,6 +1,5 @@
 import {db_connection} from '@/dbConfig/dbconfig';
 import Posts from '@/models/postsModels';
-import User from '@/models/userModels';
 import { NextResponse, NextRequest } from 'next/server';
 import {jwtDecode} from 'jwt-decode'
 import {cookies} from 'next/headers'
