@@ -1,4 +1,5 @@
 import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import {db_connection} from '@/dbConfig/dbconfig';
 import User from '@/models/userModels';
 
@@ -8,6 +9,10 @@ export const authOptions = {
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+  })
   ],
   callback: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

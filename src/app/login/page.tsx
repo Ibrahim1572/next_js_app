@@ -106,6 +106,15 @@ function Page() {
                         Sign In with GitHub
                     </button>
                 </div>
+                <div className="mt-1">
+                    <button 
+                        type="button"
+                        onClick={function() { signIn('google') }}
+                        className="w-full py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white font-semibold rounded-lg shadow-md transition duration-200 flex items-center justify-center gap-2"
+                    >
+                        Sign In with Google
+                    </button>
+                </div>
                 {/* Divider & Secondary Action */}
                 <div className="mt-8 text-center border-t border-slate-700 pt-6">
                     <p className="text-sm text-slate-400 mb-3">Don't have an account?</p>
