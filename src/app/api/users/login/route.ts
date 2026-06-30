@@ -24,8 +24,9 @@ export async function POST(request: NextRequest){
 
 
         const tokenData={
-            id: dbUser._id,
+            name: dbUser.name,
             email: dbUser.email
+
         }
         console.log(`dbUser: ${dbUser}`)
         console.log(`token data: ${tokenData}`)

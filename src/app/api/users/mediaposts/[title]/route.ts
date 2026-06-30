@@ -4,6 +4,8 @@ import User from '@/models/userModels';
 import { NextResponse, NextRequest } from 'next/server';
 import {jwtDecode} from 'jwt-decode'
 import {cookies} from 'next/headers'
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
 interface RouteParams {
   params: Promise<{ title: string }>
 }
@@ -35,28 +37,52 @@ export async function DELETE(request :NextRequest, context: RouteParams){
     try {
         //get user details
         const cookieStore=cookies();
+        let extractedUserEmail=""
+        let cookieType='jwt'
         let tokenCookie=(await cookieStore).get('token');
         
         if(!tokenCookie){
             tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+            cookieType='nextAuth'
         }
         if(!tokenCookie){
             tokenCookie=(await cookieStore).get('next-auth.session-token')
+            cookieType='nextAuth'
         }
                 
         if (!tokenCookie) {
             return NextResponse.json({ message: "Token cookie not found, like user is not logged in" }, { status: 401 });                
         }
-        const tokenValue = tokenCookie.value;
-                
-        const decodedToken= jwtDecode(tokenValue);
-        const extractedUserId = decodedToken.id;
-        console.log(`extracted user: ${extractedUserId}`)
-        const id= await User.findById(extractedUserId)
 
-        if(!id){
-            return NextResponse.json({message: "only existing users can post, login or sign up first", status: 401})
-        }
+        if(cookieType==='jwt'){
+                    const tokenValue = tokenCookie.value;
+                    const decodedToken= jwtDecode(tokenValue);
+                    extractedUserEmail = decodedToken.email;
+                }
+        
+                if(cookieType==='nextAuth'){
+                    const session = await getServerSession(authOptions);
+                    // console.log(`session: ${session}`)
+                    // console.log(`session value: ${session.value}`)
+                    // console.log(`session user: ${session.user}`)
+                    // console.log(`Stringified Session: ${JSON.stringify(session, null, 2)}`);
+                    // console.log(`session user email: ${session.user.email}`)
+                    if (session && session.user && session.user.email) {
+                        extractedUserEmail = session.user.email;
+                        }
+                }
+
+
+        // const tokenValue = tokenCookie.value;
+                
+        // const decodedToken= jwtDecode(tokenValue);
+        // const extractedUserId = decodedToken.id;
+        // console.log(`extracted user: ${extractedUserId}`)
+        // const id= await User.findById(extractedUserId)
+
+        // if(!id){
+        //     return NextResponse.json({message: "only existing users can post, login or sign up first", status: 401})
+        // }
 
         // get title
         const {title}=await context.params
@@ -71,7 +97,7 @@ export async function DELETE(request :NextRequest, context: RouteParams){
         const dbId=await dbPost.postedBy
 
         //check db post and logged in user is same
-        if(extractedUserId!==dbId){
+        if(extractedUserEmail!==dbId){
             return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401})
         }
 
@@ -90,28 +116,51 @@ export async function POST(request :NextRequest, context: RouteParams){
     try {
         //get user details
         const cookieStore=cookies();
+        let extractedUserEmail=''
         let tokenCookie=(await cookieStore).get('token')
+        let cookieType='jwt'
 
         if(!tokenCookie){
             tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+            cookieType='nextAuth'
         }
         if(!tokenCookie){
             tokenCookie=(await cookieStore).get('next-auth.session-token')
+            cookieType='nextAuth'
         }
                 
         if (!tokenCookie) {
             return NextResponse.json({ message: "Token cookie not found, like user is not logged in" }, { status: 401 });                
         }
-        const tokenValue = tokenCookie.value;
-                
-        const decodedToken= jwtDecode(tokenValue);
-        const extractedUserId = decodedToken.id;
-        console.log(`extracted user: ${extractedUserId}`)
-        const id= await User.findById(extractedUserId)
 
-        if(!id){
-            return NextResponse.json({message: "only existing users can update post, login or sign up first", status: 401})
-        }
+        if(cookieType==='jwt'){
+                    const tokenValue = tokenCookie.value;
+                    const decodedToken= jwtDecode(tokenValue);
+                    extractedUserEmail = decodedToken.email;
+                }
+        
+                if(cookieType==='nextAuth'){
+                    const session = await getServerSession(authOptions);
+                    // console.log(`session: ${session}`)
+                    // console.log(`session value: ${session.value}`)
+                    // console.log(`session user: ${session.user}`)
+                    // console.log(`Stringified Session: ${JSON.stringify(session, null, 2)}`);
+                    // console.log(`session user email: ${session.user.email}`)
+                    if (session && session.user && session.user.email) {
+                        extractedUserEmail = session.user.email;
+                        }
+                }
+
+        // const tokenValue = tokenCookie.value;
+                
+        // const decodedToken= jwtDecode(tokenValue);
+        // const extractedUserId = decodedToken.id;
+        // console.log(`extracted user: ${extractedUserId}`)
+        // const id= await User.findById(extractedUserId)
+
+        // if(!id){
+        //     return NextResponse.json({message: "only existing users can update post, login or sign up first", status: 401})
+        // }
 
         // get title
         const {title}=await context.params
@@ -123,10 +172,10 @@ export async function POST(request :NextRequest, context: RouteParams){
             return NextResponse.json({message: `Post with "${title}" title Not Found can not update post`, status: 404})
         }
 
-        const dbId=dbPost.postedBy.toString()
+        const dbId=dbPost.postedBy
 
         //check db post and logged in user is same
-        if(extractedUserId!==dbId){
+        if(extractedUserEmail!==dbId){
             return NextResponse.json({success: false, message: "You can not update soemone else's post", status: 401})
         }
 

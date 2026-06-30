@@ -35,13 +35,14 @@ function Page(){
             {/* Displaying the data if it exists */}
             {userData? (
                 <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                    <p><strong>Email:</strong> {userData.email}</p>
-                    <p><strong>ID:</strong> {userData._id}</p>
+                    <p><strong>Email:</strong> {userData.name}</p>
+                    <p><strong>ID:</strong> {userData.email}</p>
                 </div>
             ):(<div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                    <p><strong>Users Logged in with github can not be fetched</strong></p>
+                    <p><strong></strong></p>
                     
                 </div>)}
+
 
             <div className="flex gap-4">
                 {/* Fixed border classes by adding 'border-b-2' */}
