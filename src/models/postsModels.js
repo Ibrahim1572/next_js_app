@@ -21,6 +21,13 @@ const postsSchema=mongoose.Schema({
     postDisLikes:{
         type: Number,
         default: 0
+    },
+    isdeleted:{
+        type: Boolean,
+        default: false
+    },
+    deletedDate:{
+        type: Date
     }
 },
     {

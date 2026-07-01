@@ -13,7 +13,7 @@ function Page(){
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onSignUp = async (formData:any) =>{
         const data={
-            username: formData.get('username').trim(),
+            userName: formData.get('username').trim(),
             email: formData.get('email').trim(),
             password: formData.get('password').trim()
         }

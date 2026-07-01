@@ -58,8 +58,8 @@ export async function POST(request: NextRequest){
         // if(!id){
         //     return NextResponse.json({message: "only existing users can post", status: 401})
         // }
-
-        const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": extractedUserEmail})
+        const dateNow= new Date()
+        const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": extractedUserEmail, 'deletedDate':dateNow})
         const savedPost=await newPost.save()
         
         return NextResponse.json({post: savedPost, success:true, message:"Post added", status:201})
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest){
 export async function GET(){
     await db_connection();
     try {
-        const allPosts=await Posts.find({}).sort({updatedAt: -1}).limit(10)
+        const allPosts=await Posts.find({isdeleted:false}).sort({updatedAt: -1}).limit(20)
         if(!allPosts){
             return NextResponse.json({info: "No posts, (DB is empty)", success:true})
         }

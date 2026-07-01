@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, context: RouteParams){
         const {title}=await context.params
         const decodedTitle=decodeURIComponent(title);
 
-        const dbPost= await Posts.findOne({postTitle: decodedTitle})||""
+        const dbPost= await Posts.findOne({postTitle: decodedTitle, isdeleted:false})||""
 
         if(!dbPost){
             return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404})
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest, context: RouteParams){
     }
 }
 
-export async function DELETE(request :NextRequest, context: RouteParams){
+export async function PATCH(request :NextRequest, context: RouteParams){
     await db_connection();
     try {
         //get user details
@@ -100,8 +100,8 @@ export async function DELETE(request :NextRequest, context: RouteParams){
         if(extractedUserEmail!==dbId){
             return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401})
         }
-
-        const deletedPost= await Posts.findOneAndDelete({postTitle: decodedTitle})
+        const dateNow=new Date()
+        const deletedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle, isdeleted:false}, {$set:{isdeleted:true, deletedDate:dateNow}})
         return NextResponse.json({post: deletedPost, success: true, message: 'Post deleted permanently'})
         
     } 

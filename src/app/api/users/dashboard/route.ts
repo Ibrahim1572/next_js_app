@@ -1,28 +1,119 @@
-import {db_connection} from '@/dbConfig/dbconfig';
+import { db_connection } from '@/dbConfig/dbconfig';
 import Posts from '@/models/postsModels';
-import User from '@/models/userModels';
-import { NextResponse, NextRequest } from 'next/server';
-import {jwtDecode} from 'jwt-decode'
-import {cookies} from 'next/headers'
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
+import { NextResponse } from 'next/server';
 
 export async function GET(){
     await db_connection();
     try {
-        // const allPosts=await Posts.find({}).sort({updatedAt: -1})
-        const anchor=new Date()
-        console.log(anchor)
-        anchor.setDate( anchor.getDate()-30)
+        const createdData = [];
+        let min = 0;
+        let max = 2;
+        const maxDate = new Date();
+        const minDate = new Date();
+        maxDate.setDate(maxDate.getDate() - max);
+        minDate.setDate(minDate.getDate() - min);
 
+        for(let i = 0; i < 8; i++){
+            const posts = await Posts.find({
+                createdAt: {
+                    $gte: maxDate,
+                    $lte: minDate
+                }
+            });
 
-        console.log(anchor)
+            createdData[i] = posts.length;
 
-        return NextResponse.json({})
+            min += 4;
+            max += 4;
+            maxDate.setDate(maxDate.getDate() - max);
+            minDate.setDate(minDate.getDate() - min);
+        }
+
+        const updatedData = [];
+        // FIXED: Resetting local bucket bounds specifically for the update loop
+        let minUp = 0;
+        let maxUp = 2;
+        const maxDateUpdate = new Date();
+        const minDateUpdate = new Date();
+        maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
+        minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
+
+        for(let i = 0; i < 8; i++){
+            const posts = await Posts.find({
+                // FIXED: Querying updated lifecycle window fields
+                updatedAt: {
+                    $gte: maxDateUpdate,
+                    $lte: minDateUpdate
+                },
+                $expr: { 
+                    $and: [
+                        { $ne: ["$updatedAt", "$createdAt"] },
+                        { $ne: ["$updatedAt", "$deletedDate"] }
+                    ]
+                }
+            });
+
+            updatedData[i] = posts.length;
+
+            minUp += 4;
+            maxUp += 4;
+            maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
+            minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
+        }
+
+        const deletedData = [];
+        // FIXED: Resetting local bucket bounds specifically for the delete loop
+        let minDel = 0;
+        let maxDel = 2;
+        const maxDateDelete = new Date();
+        const minDateDelete = new Date();
+        maxDateDelete.setDate(maxDateDelete.getDate() - maxDel);
+        minDateDelete.setDate(minDateDelete.getDate() - minDel);
+
+        for(let i = 0; i < 8; i++){
+            const posts = await Posts.find({
+                // FIXED: Referencing the correct query variable parameters
+                deletedDate: {
+                    $gte: maxDateDelete,
+                    $lte: minDateDelete
+                },
+                $expr: { 
+                    $and: [
+                        { $ne: ["$deletedDate", "$createdAt"] },
+                        { $ne: ["$deletedDate", "$updatedAt"] }
+                    ]
+                }
+            });
+
+            deletedData[i] = posts.length;
+
+            minDel += 4;
+            maxDel += 4;
+            maxDateDelete.setDate(maxDateDelete.getDate() - maxDel);
+            minDateDelete.setDate(minDateDelete.getDate() - minDel);
+        }
+
+        const dataBuckets = [
+            '1-4 ago', '5-8 ago', '9-12 ago', '13-16 ago',
+            '17-20 ago', '21-24 ago', '25-28 ago', '29-32 ago'
+        ];
+
+        const chartData = [];
+        for(let i = 7; i >= 0; i--){
+            chartData.push({
+                'name': dataBuckets[i],
+                'created': createdData[i],
+                'updated': updatedData[i],
+                'deleted': deletedData[i]
+            });
+        }
+
+        // FIXED: Explicitly matches response structure key expected by client
+        return NextResponse.json({ 'data': chartData });
         
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    catch (error:any) {
-        return NextResponse.json({info: "Got error in view all api route", message: error.message, status:500, success:false})
+    catch (error: any) {
+        return NextResponse.json({ info: "Got error in view all api route", message: error.message, status: 500, success: false });
     }
 }

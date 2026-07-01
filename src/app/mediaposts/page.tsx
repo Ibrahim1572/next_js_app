@@ -1,9 +1,9 @@
 'use client'
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import axios from 'axios'
 import {useRouter} from 'next/navigation'
-import { CartesianGrid, Legend, Line, LineChart, XAxis, YAxis } from 'recharts';
-import { RechartsDevtools } from '@recharts/devtools';
+import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+
 
 function Page(){
     const router=useRouter()
@@ -71,18 +71,25 @@ function Page(){
 
     const deletePost=async()=>{
         const oldTitle = postDataOne?.postTitle 
-        await axios.delete('/api/users/mediaposts/'+encodeURIComponent(oldTitle))
+        await axios.patch('/api/users/mediaposts/'+encodeURIComponent(oldTitle))
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [chartGraphData, setChartGraphData] = useState<any[]>([])
 
-    const data = [
-    { name: 'Jan', uv: 4000 },
-    { name: 'Feb', uv: 3000 },
-    { name: 'Mar', uv: 2000 },
-    { name: 'Apr', uv: 2780 },
-    { name: 'May', uv: 1890 },
-    { name: 'Jun', uv: 2390 },
-    { name: 'Jul', uv: 3490 },
-    ];
+    const getGraphData=async()=>{
+        // const data=await axios.get('/api/users/dashboard')|| []
+        // console.log(`data: ${data}`)
+        // return data.data
+
+        const response = await axios.get('/api/users/dashboard')
+        if (response.data && response.data['data']) {
+            setChartGraphData(response.data['data']);
+    }}
+
+    useEffect(function() {
+        getGraphData();
+    }, []);
+
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stateJSX=()=>{
@@ -325,31 +332,74 @@ function Page(){
                     </button>
                 </form>
                 )
-            case 'graphs':
-                return (
-                    <>
 
-                    </>
-                )
+            case 'dashboard':
+                return (
+                    <div className="w-full">
+                        <h1 className="text-xl font-bold mb-4 text-center">Simple Area Chart</h1>
+                        <div className="w-full h-[400px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart
+                                    data={chartGraphData}
+                                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                                >
+                                    <defs>
+                                        <linearGradient id="colorCreated" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#34d399" stopOpacity={0.8} />
+                                            <stop offset="95%" stopColor="#34d399" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="colorUpdated" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#df4141" stopOpacity={0.8} />
+                                            <stop offset="95%" stopColor="#df4141" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="colorDeleted" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#eaec49" stopOpacity={0.8} />
+                                            <stop offset="95%" stopColor="#eaec49" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                                    <XAxis dataKey="name" stroke="#cbd5e1" />
+                                    <YAxis stroke="#cbd5e1" />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
+                                        labelStyle={{ color: '#f1f5f9' }}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="created"
+                                        stroke="#34d399"
+                                        fillOpacity={1}
+                                        fill="url(#colorCreated)"
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="updated"
+                                        stroke="#df4141"
+                                        fillOpacity={1}
+                                        fill="url(#colorUpdated)"
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="deleted"
+                                        stroke="#eaec49"
+                                        fillOpacity={1}
+                                        fill="url(#colorDeleted)"
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                );
+
+
             default:
                 return (
-                    <>
-                        <h1 className='p-4'>sample chart</h1>
-                        <LineChart style={{ width: '100%', aspectRatio: 1.618, maxWidth: 600 }} responsive data={data} margin={{
-                            top: 20,
-                            right: 20,
-                            bottom: 5,
-                            left: 0,
-                        }}>
-                            <CartesianGrid stroke="#aaaaaa" strokeDasharray="5 5" />
-                            <Line type="monotone" dataKey="uv" stroke="purple" strokeWidth={2} name="My data series name" />
-                            <XAxis dataKey="name" />
-                            <YAxis width="auto" label={{ value: 'UV', position: 'insideLeft', angle: -90 }} />
-                            <Legend align="right" />
-                            <RechartsDevtools />
-                        </LineChart>
-                    </>
-                )
+                    <header className="flex flex-col w-full items-center">
+                        <h1 className="p-4 text-xl font-bold">
+                            Old Dashboard
+                        </h1>
+                    </header>
+                );
         }
     }
 
@@ -371,13 +421,13 @@ function Page(){
 
 
             <header className='flex flex-row '>
-                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('dashboard'); }}>Analytic Dashboard</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView(''); }}>Dashboard</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){getGraphData();setCurrentView('dashboard'); }}>Analytic Dashboard</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('addPost'); }}>Add Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewOne'); }}>View One Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll()}}>View All Posts</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('updatePost');}}>Update Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Delete Post</div>
-                {/* <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('graphs');}}>Graphs</div> */}
             </header>
 
 
@@ -385,9 +435,9 @@ function Page(){
 
 
 
-            <header>
-                <div className='flex h-auto grow p-4 outline-2 bg-blue-300/30 rounded-xl mx-64 my-8 items-center justify-center'>
-                    <div className='flex items-center justify-center p-4'>
+            <header className="w-full flex justify-center">
+                <div className='flex h-auto w-full max-w-5xl p-4 outline-2 bg-blue-300/30 rounded-xl mx-4 my-8 items-center justify-center'>
+                    <div className='w-full flex items-center justify-center p-4 text-white'>
                         {stateJSX()}
                     </div>
                     

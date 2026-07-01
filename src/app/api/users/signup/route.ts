@@ -7,7 +7,7 @@ export async function POST(request: NextRequest){
     await db_connection();
     try {
         const reqBody= await request.json()
-        const{email, username, password}=reqBody
+        const{email, userName, password}=reqBody
         // const emailLower=email.toLowerCase()
 
         // if(password!==confirmPassword){
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest){
             return NextResponse.json({error: 'User already registerd', status:400})
         }
         console.log(user)
-        const newUser= new User({email, username, password})
+        const newUser= new User({email, userName, password})
         const savedUser=await newUser.save()
         console.log(savedUser)
 

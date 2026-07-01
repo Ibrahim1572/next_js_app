@@ -10,10 +10,6 @@ const userSchema=mongoose.Schema({
         type: String,
         required: true
     },
-    // confirmPassword: {
-    //     type: String,
-    //     requre: true
-    // },
     email: {
         type: String ,
         required:true,
