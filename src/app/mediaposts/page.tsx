@@ -55,8 +55,8 @@ function Page(){
         if (!postDataOne) return;
         
         const data={
-            newPostTitle: formData.get('newTitle').trim(), 
-            newPostBody: formData.get('newBody').trim()
+            newPostTitle: formData.get('newTitle'), 
+            newPostBody: formData.get('newBody')
         }
         // Change '.title' to '.postTitle' to match your schema
         const oldTitle = postDataOne?.postTitle 

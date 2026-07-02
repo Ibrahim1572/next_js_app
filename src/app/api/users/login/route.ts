@@ -2,6 +2,7 @@ import {db_connection} from '@/dbConfig/dbconfig'
 import User from '@/models/userModels'
 import { NextResponse, NextRequest } from 'next/server'
 import jwt from 'jsonwebtoken'
+import toast from 'react-hot-toast'
 
 export async function POST(request: NextRequest){
     await db_connection();
@@ -14,11 +15,11 @@ export async function POST(request: NextRequest){
         
         if(!dbUser){
             console.log("dbUser is null/wrong email/user not exists")
-            return NextResponse.json({message: "Not loggd in, dbUser is null/wrong email/user not exists", status :409, User:dbUser})
+            return NextResponse.json({message: "Not loggd in, dbUser is null/wrong email/user not exists", status :409, User:dbUser, toastMessage:'User Not Found'})
         }
         if(dbUser.password!==password){
             console.log("wrong password")
-            return NextResponse.json({message: "Wrong Password", status :401, User:dbUser})
+            return NextResponse.json({message: "Wrong Password", status :401, User:dbUser, toastMessage: 'Invalid Password'})
         }
         console.log('Login Sucessful')
 
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest){
         console.log(`Secret key= ${tk_secret}`)
         const token= jwt.sign(tokenData, tk_secret, {expiresIn: '1d'})
 
-        const response= NextResponse.json({message: 'user loggedIN sucessfully: ', success: true, status:200, User:dbUser})
+        const response= NextResponse.json({message: 'user loggedIN sucessfully: ', success: true, status:200, User:dbUser, toastMessage: 'Login Successfull'})
         response.cookies.set('token', token, {httpOnly:true})
 
         console.log(response.cookies)

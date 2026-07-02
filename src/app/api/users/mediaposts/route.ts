@@ -28,7 +28,7 @@ export async function POST(request: NextRequest){
         
         if (!tokenCookie) {
             cookieType=""
-            return NextResponse.json({ message: "Token cookie not found", status: 401, message: 'Unauthorized user' });   
+            return NextResponse.json({ message: "Token cookie not found", status: 401, toastMessage: 'Unauthorized user' });   
         }
                     
         
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest){
         const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": extractedUserEmail, 'deletedDate':dateNow})
         const savedPost=await newPost.save()
         
-        return NextResponse.json({post: savedPost, success:true, message:"Post added", status:201})
+        return NextResponse.json({post: savedPost, success:true, message:"Post added", status:201, toastMessage:'Post added'})
 
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

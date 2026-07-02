@@ -94,7 +94,7 @@ export async function PATCH(request :NextRequest, context: RouteParams){
     }
 }
 
-export async function POST(request :NextRequest, context: RouteParams){
+export async function PATCH(request :NextRequest, context: RouteParams){
     await db_connection();
     try {
         //get user details
@@ -149,7 +149,10 @@ export async function POST(request :NextRequest, context: RouteParams){
 
         //get details from next request
         const reqBody=await request.json()
-        const {newPostTitle, newPostBody}=reqBody;
+        let {newPostTitle, newPostBody}=reqBody;
+        
+        newPostTitle=newPostTitle.trim();
+        newPostBody=newPostBody.trim();
 
         // const oldPost=dbPost
         const oldPost=dbPost

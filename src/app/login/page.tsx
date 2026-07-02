@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn } from 'next-auth/react'
+import toast from 'sonner'
 
 function Page() {
     const { data: session, status } = useSession()
+    const [toastMsg, setToastMsg]=useState('')
     const router = useRouter()
     const [user, setUser] = useState({
         password: "",
@@ -25,8 +27,28 @@ function Page() {
             password: formData.get('password').trim()
         }
         const response = await axios.post("/api/users/login", data)
-        console.log("Signup success:", response.data)
-        alert("Logged in successfully!")
+        // const response = await fetch("/api/users/login",{
+        //     method:'POST',
+        //     body: JSON.stringify(data)
+        // })
+        // const responseData=await response
+        // console.log("Signup success:", responseData)
+        console.log('helooooooooooooooooooooooo')
+        console.log(`response from frontend: ${response}`)
+        console.log(`response from frontend: ${response.data.toastMessage}`)
+        console.log(`response from frontend: ${response.data}`)
+
+        // console.log()
+
+        // setToastMsg()
+        // console.log(`message from toast: ${toastMsg}`)
+        if(response.data.status===200){
+            toast.success(response.data.toastMessage)
+        }
+        else{
+            toast.error(response.data.toastMessage)
+        }
+        
         window.location.href = '/mediaposts';
 
     }
