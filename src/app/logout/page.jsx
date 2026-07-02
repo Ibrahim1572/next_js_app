@@ -2,6 +2,7 @@
 import {useState} from 'react'
 import axios from 'axios'
 import {useRouter} from 'next/navigation'
+import toast from 'react-hot-toast'
 
 function Page(){
     const router=useRouter()
@@ -12,6 +13,12 @@ function Page(){
             password: ""
         }
         const response = await axios.post("/api/users/logout", data)
+        if(response.data.status===200){
+                    toast.success(response.data.toastMessage)
+                }
+                else{
+                    toast.error(response.data.toastMessage)
+                }
         console.log("Signup success:", response.data)
         alert("Logged Out successfully!")
         router.push('/login')

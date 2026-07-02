@@ -28,7 +28,7 @@ export async function POST(request: NextRequest){
         }
 
         if (!tokenCookie) {
-            return NextResponse.json({ message: "Token cookie not found" }, { status: 401 });
+            return NextResponse.json({ message: "Token cookie not found", toastMessage: 'No user logged in: UNAUTHORIZED ACCESS' }, { status: 401 });
         }
 
         if(cookieType==='jwt'){
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest){
 
         
         const userData={email:extractedUserEmail, name:extractedUserName}
-        const response =NextResponse.json({'User Data': userData, status:200})
+        const response =NextResponse.json({'User Data': userData, status:200, toastMessage:'Data Retrieved Successfully'})
         return response        
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

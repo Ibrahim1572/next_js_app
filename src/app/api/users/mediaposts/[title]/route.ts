@@ -20,10 +20,10 @@ export async function GET(request: NextRequest, context: RouteParams){
         const dbPost= await Posts.findOne({postTitle: decodedTitle, isdeleted:false})||""
 
         if(!dbPost){
-            return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404})
+            return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404, toastMessage: 'Post Not Found'})
         }
 
-        return NextResponse.json({post: dbPost, success: true, message: 'Post retrived', status:200})
+        return NextResponse.json({post: dbPost, success: true, message: 'Post retrived', status:200, toastMessage:'Post Found'})
     } 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
@@ -31,7 +31,8 @@ export async function GET(request: NextRequest, context: RouteParams){
     }
 }
 
-export async function PATCH(request :NextRequest, context: RouteParams){
+//delete post api 
+export async function POST(request :NextRequest, context: RouteParams){
     await db_connection();
     try {
         const cookieStore=cookies();
@@ -49,7 +50,7 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         }
                 
         if (!tokenCookie) {
-            return NextResponse.json({ message: "Token cookie not found, user is not logged in", status: 401 });                
+            return NextResponse.json({ message: "Token cookie not found, user is not logged in", status: 401, toastMessage:'No user logged In: UNAUTHORIZED ACCESS' });                
         }
 
         if(cookieType==='jwt'){
@@ -74,18 +75,18 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         const dbPost= await Posts.findOne({postTitle: decodedTitle})||""
 
         if(!dbPost){
-            return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404})
+            return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404, toastMessage: 'Post Not Found'})
         }
 
         const dbId=await dbPost.postedBy
 
         //check db post and logged in user is same
         if(extractedUserEmail!==dbId){
-            return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401, error=error.message})
+            return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401, toastMessage:"INVALID ACTION: You can not delete soemone else's post"})
         }
         const dateNow=new Date()
         const deletedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle, isdeleted:false}, {$set:{isdeleted:true, deletedDate:dateNow}})
-        return NextResponse.json({post: deletedPost, success: true, message: 'Post deleted permanently', status:200})
+        return NextResponse.json({post: deletedPost, success: true, message: 'Post deleted permanently', status:200, toastMessage: 'Post Deleted Successfully'})
         
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,6 +95,7 @@ export async function PATCH(request :NextRequest, context: RouteParams){
     }
 }
 
+//update post api
 export async function PATCH(request :NextRequest, context: RouteParams){
     await db_connection();
     try {
@@ -113,7 +115,7 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         }
                 
         if (!tokenCookie) {
-            return NextResponse.json({ message: "Token cookie not found, like user is not logged in" }, { status: 401 });                
+            return NextResponse.json({ message: "Token cookie not found, like user is not logged in" }, { status: 401, toastMessage:'No user logged in: UNAUTORIZED ACCESS' });                
         }
 
         if(cookieType==='jwt'){
@@ -137,14 +139,14 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         const dbPost= await Posts.findOne({postTitle: decodedTitle})||""
 
         if(!dbPost){
-            return NextResponse.json({message: `Post with "${title}" title Not Found can not update post`, status: 404})
+            return NextResponse.json({message: `Post with "${title}" title Not Found can not update post`, status: 404, toastMessage: 'Post not found'})
         }
 
         const dbId=dbPost.postedBy
 
         //check db post and logged in user is same
         if(extractedUserEmail!==dbId){
-            return NextResponse.json({success: false, message: "You can not update soemone else's post", status: 401})
+            return NextResponse.json({success: false, message: "You can not update soemone else's post", status: 401, toastMessage: "INVALID ACTION: You can not update someone else's post"})
         }
 
         //get details from next request
@@ -160,7 +162,7 @@ export async function PATCH(request :NextRequest, context: RouteParams){
 
         //check if both fields are empty
         if(newPostTitle&&newPostBody ===""){
-            return NextResponse.json({success: false, message: "No field to change", status:422})
+            return NextResponse.json({success: false, message: "No field to change", status:422, toastMessage:'Enter either a title or a body'})
         }
         //for when only body needs changing
         if(!newPostTitle){
@@ -176,11 +178,11 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         }
 
         
-        return NextResponse.json({"Updated Post": updatedPost, "Old Post": oldPost, success: true, message: 'Post Updated', status:200})
+        return NextResponse.json({"Updated Post": updatedPost, "Old Post": oldPost, success: true, message: 'Post Updated', status:200, toastMessage: 'Post Updated Successfully'})
         
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
-        return NextResponse.json({message: "Got error in delete post api route", error: error.message, status:500, success:false})
+        return NextResponse.json({message: "Got error in update post api route", error: error.message, status:500, success:false})
     }
 }

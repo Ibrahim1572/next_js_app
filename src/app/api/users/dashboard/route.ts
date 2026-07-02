@@ -108,8 +108,7 @@ export async function GET(){
             });
         }
 
-        // FIXED: Explicitly matches response structure key expected by client
-        return NextResponse.json({ 'data': chartData, status:200, success: true });
+        return NextResponse.json({ 'data': chartData, status:200, success: true, toastMessage: 'Data Retrieved' });
         
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

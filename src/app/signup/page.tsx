@@ -2,6 +2,7 @@
 import {useState} from 'react'
 import axios from 'axios'
 import {useRouter} from 'next/navigation'
+import toast from 'react-hot-toast'
 
 function Page(){
     const router= useRouter()
@@ -18,8 +19,14 @@ function Page(){
             password: formData.get('password').trim()
         }
         const response = await axios.post("/api/users/signup", data)
-        console.log("Signup success:", response.data)
-        alert("Signed up successfully!")
+        if(response.data.status===200){
+            toast.success(response.data.toastMessage)
+        }
+        else{
+            toast.error(response.data.toastMessage)
+        }
+        // console.log("Signup success:", response.data)
+        // alert("Signed up successfully!")
         goToLogin()
     }
 

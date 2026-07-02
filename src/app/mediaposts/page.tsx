@@ -3,6 +3,7 @@ import {useState, useEffect} from 'react'
 import axios from 'axios'
 import {useRouter} from 'next/navigation'
 import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import toast from 'react-hot-toast'
 
 
 function Page(){
@@ -33,6 +34,12 @@ function Page(){
             body: formData.get('body').trim()
         }
         const response=await axios.post('/api/users/mediaposts', data)
+        if(response.data.status===200){
+                    toast.success(response.data.toastMessage)
+                }
+                else{
+                    toast.error(response.data.toastMessage)
+                }
         setCurrentView("")
         console.log(response)
     }
@@ -41,6 +48,12 @@ function Page(){
         setPostData([])
         const temp=await axios.get('/api/users/mediaposts')
         setPostData(temp.data.posts)
+        if(temp.data.status===200){
+            toast.success(temp.data.toastMessage)
+        }
+        else{
+            toast.error(temp.data.toastMessage)
+        }
         // return 
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,6 +61,12 @@ function Page(){
         const searchTitle=formData.get('title').trim()
         const temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle))
         setPostDataOne(temp.data.post)
+        if(temp.data.status===200){
+            toast.success(temp.data.toastMessage)
+        }
+        else{
+            toast.error(temp.data.toastMessage)
+        }
         
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -62,7 +81,13 @@ function Page(){
         const oldTitle = postDataOne?.postTitle 
         
         // Note: If your backend endpoint uses PUT for updates, change .post to .put
-        await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle), data)
+        const response= await axios.patch('/api/users/mediaposts/'+encodeURIComponent(oldTitle), data)
+        if(response.data.status===200){
+            toast.success(response.data.toastMessage)
+        }
+        else{
+            toast.error(response.data.toastMessage)
+        }
         
         // Reset view or clean up
         setCurrentView("")
@@ -71,7 +96,13 @@ function Page(){
 
     const deletePost=async()=>{
         const oldTitle = postDataOne?.postTitle 
-        await axios.patch('/api/users/mediaposts/'+encodeURIComponent(oldTitle))
+        const response= await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle))
+        if(response.data.status===200){
+            toast.success(response.data.toastMessage)
+        }
+        else{
+            toast.error(response.data.toastMessage)
+        }
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [chartGraphData, setChartGraphData] = useState<any[]>([])
@@ -84,6 +115,12 @@ function Page(){
         const response = await axios.get('/api/users/dashboard')
         if (response.data && response.data['data']) {
             setChartGraphData(response.data['data']);
+        if(response.data.status===200){
+            toast.success(response.data.toastMessage)
+        }
+        else{
+            toast.error(response.data.toastMessage)
+        }
     }}
 
     useEffect(function() {

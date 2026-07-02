@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn } from 'next-auth/react'
-import toast from 'sonner'
+import {toast} from 'react-hot-toast'
 
 function Page() {
     const { data: session, status } = useSession()
@@ -27,21 +27,7 @@ function Page() {
             password: formData.get('password').trim()
         }
         const response = await axios.post("/api/users/login", data)
-        // const response = await fetch("/api/users/login",{
-        //     method:'POST',
-        //     body: JSON.stringify(data)
-        // })
-        // const responseData=await response
-        // console.log("Signup success:", responseData)
-        console.log('helooooooooooooooooooooooo')
-        console.log(`response from frontend: ${response}`)
-        console.log(`response from frontend: ${response.data.toastMessage}`)
-        console.log(`response from frontend: ${response.data}`)
-
-        // console.log()
-
-        // setToastMsg()
-        // console.log(`message from toast: ${toastMsg}`)
+        
         if(response.data.status===200){
             toast.success(response.data.toastMessage)
         }

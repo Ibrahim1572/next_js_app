@@ -2,6 +2,7 @@
 import axios from 'axios'
 import {useRouter} from 'next/navigation'
 import {useState} from 'react'
+import toast from 'react-hot-toast'
 
 function Page(){
     const router=useRouter()
@@ -9,23 +10,29 @@ function Page(){
 
     const getData=async()=>{
         const response = await axios.post("/api/users/profile")
+        if(response.data.status===200){
+                    toast.success(response.data.toastMessage)
+                }
+                else{
+                    toast.error(response.data.toastMessage)
+                }
         setUserData(response.data.dbUser)
-        console.log("-----------------------------------------------------------")
-        console.log(response.data)
+        // console.log("-----------------------------------------------------------")
+        // console.log(response.data)
         return response
     }
 
     const goToSignOut= async()=>{
         router.push("/logout")
     }
-    const response1 = axios.post("/api/users/profile")
-    console.log(response1)
+    // const response1 = axios.post("/api/users/profile")
+    // console.log(response1)
 
     const goToMediaPosts= async()=>{
         router.push("/mediaposts")
     }
-    const response2 = axios.post("/api/users/mediaposts")
-    console.log(response2)
+    // const response2 = axios.post("/api/users/mediaposts")
+    // console.log(response2)
     
 
     return (

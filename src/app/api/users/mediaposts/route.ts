@@ -54,7 +54,7 @@ export async function POST(request: NextRequest){
         const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": extractedUserEmail, 'deletedDate':dateNow})
         const savedPost=await newPost.save()
         
-        return NextResponse.json({post: savedPost, success:true, message:"Post added", status:201, toastMessage:'Post added'})
+        return NextResponse.json({post: savedPost, success:true, message:"Post added", status:200, toastMessage:'Post added Successfully'})
 
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,9 +68,9 @@ export async function GET(){
     try {
         const allPosts=await Posts.find({isdeleted:false}).sort({updatedAt: -1}).limit(20)
         if(!allPosts){
-            return NextResponse.json({info: "No posts, (DB is empty)", success:true})
+            return NextResponse.json({info: "No posts, (DB is empty)", success:true, toastMessage:'No Posts to Load'})
         }
-        return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts})
+        return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Posts Retrieved'})
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
