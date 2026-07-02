@@ -1,6 +1,5 @@
 import {db_connection} from '@/dbConfig/dbconfig';
 import Posts from '@/models/postsModels';
-import User from '@/models/userModels';
 import { NextResponse, NextRequest } from 'next/server';
 import {jwtDecode} from 'jwt-decode'
 import {cookies} from 'next/headers'
@@ -24,7 +23,7 @@ export async function GET(request: NextRequest, context: RouteParams){
             return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404})
         }
 
-        return NextResponse.json({post: dbPost, success: true, message: 'Post retrived'})
+        return NextResponse.json({post: dbPost, success: true, message: 'Post retrived', status:200})
     } 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
@@ -35,7 +34,6 @@ export async function GET(request: NextRequest, context: RouteParams){
 export async function PATCH(request :NextRequest, context: RouteParams){
     await db_connection();
     try {
-        //get user details
         const cookieStore=cookies();
         let extractedUserEmail=""
         let cookieType='jwt'
@@ -51,7 +49,7 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         }
                 
         if (!tokenCookie) {
-            return NextResponse.json({ message: "Token cookie not found, like user is not logged in" }, { status: 401 });                
+            return NextResponse.json({ message: "Token cookie not found, user is not logged in", status: 401 });                
         }
 
         if(cookieType==='jwt'){
@@ -62,27 +60,12 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         
                 if(cookieType==='nextAuth'){
                     const session = await getServerSession(authOptions);
-                    // console.log(`session: ${session}`)
-                    // console.log(`session value: ${session.value}`)
-                    // console.log(`session user: ${session.user}`)
-                    // console.log(`Stringified Session: ${JSON.stringify(session, null, 2)}`);
-                    // console.log(`session user email: ${session.user.email}`)
+        
                     if (session && session.user && session.user.email) {
                         extractedUserEmail = session.user.email;
                         }
                 }
 
-
-        // const tokenValue = tokenCookie.value;
-                
-        // const decodedToken= jwtDecode(tokenValue);
-        // const extractedUserId = decodedToken.id;
-        // console.log(`extracted user: ${extractedUserId}`)
-        // const id= await User.findById(extractedUserId)
-
-        // if(!id){
-        //     return NextResponse.json({message: "only existing users can post, login or sign up first", status: 401})
-        // }
 
         // get title
         const {title}=await context.params
@@ -98,16 +81,16 @@ export async function PATCH(request :NextRequest, context: RouteParams){
 
         //check db post and logged in user is same
         if(extractedUserEmail!==dbId){
-            return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401})
+            return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401, error=error.message})
         }
         const dateNow=new Date()
         const deletedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle, isdeleted:false}, {$set:{isdeleted:true, deletedDate:dateNow}})
-        return NextResponse.json({post: deletedPost, success: true, message: 'Post deleted permanently'})
+        return NextResponse.json({post: deletedPost, success: true, message: 'Post deleted permanently', status:200})
         
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
-        return NextResponse.json({info: "Got error in delete post api route",message: error.message, status:500, success:false})
+        return NextResponse.json({message: "Got error in delete post api route",error: error.message, status:500, success:false})
     }
 }
 
@@ -141,26 +124,11 @@ export async function POST(request :NextRequest, context: RouteParams){
         
                 if(cookieType==='nextAuth'){
                     const session = await getServerSession(authOptions);
-                    // console.log(`session: ${session}`)
-                    // console.log(`session value: ${session.value}`)
-                    // console.log(`session user: ${session.user}`)
-                    // console.log(`Stringified Session: ${JSON.stringify(session, null, 2)}`);
-                    // console.log(`session user email: ${session.user.email}`)
+                    
                     if (session && session.user && session.user.email) {
                         extractedUserEmail = session.user.email;
                         }
                 }
-
-        // const tokenValue = tokenCookie.value;
-                
-        // const decodedToken= jwtDecode(tokenValue);
-        // const extractedUserId = decodedToken.id;
-        // console.log(`extracted user: ${extractedUserId}`)
-        // const id= await User.findById(extractedUserId)
-
-        // if(!id){
-        //     return NextResponse.json({message: "only existing users can update post, login or sign up first", status: 401})
-        // }
 
         // get title
         const {title}=await context.params
@@ -187,28 +155,29 @@ export async function POST(request :NextRequest, context: RouteParams){
         const oldPost=dbPost
         let updatedPost=""
 
+        //check if both fields are empty
         if(newPostTitle&&newPostBody ===""){
-            return NextResponse.json({success: false, message: "No field to change"})
+            return NextResponse.json({success: false, message: "No field to change", status:422})
         }
+        //for when only body needs changing
         if(!newPostTitle){
             updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{postBody: newPostBody}, {new:true})||""
-            // updatedPost= await Posts.findOne({postTitle: decodedTitle})||""
         }
+        // for only when the title needs changing
         if(!newPostBody){
             updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{postTitle: newPostTitle}, {new:true})||""
-            // updatedPost= await Posts.findOne({postTitle: newPostTitle})||""
         }
+        // for when both need changing
         if(newPostTitle&&newPostBody){
             updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{postTitle: newPostTitle, postBody: newPostBody}, {new:true})||""
-            // updatedPost= await Posts.findOne({postTitle: newPostTitle})||""
         }
 
         
-        return NextResponse.json({"Updated Post": updatedPost, "Old Post": oldPost, success: true, message: 'Post Updated'})
+        return NextResponse.json({"Updated Post": updatedPost, "Old Post": oldPost, success: true, message: 'Post Updated', status:200})
         
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
-        return NextResponse.json({info: "Got error in delete post api route",message: error.message, status:500, success:false})
+        return NextResponse.json({message: "Got error in delete post api route", error: error.message, status:500, success:false})
     }
 }

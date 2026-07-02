@@ -36,13 +36,12 @@ export const authOptions = {
             console.log("Created a new database user record for GitHub profile:", dbUser._id);
           }
 
-          // Force the token id to equal your MongoDB collection document string _id
           token.id = dbUser._id.toString();
 
         } 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         catch (error: any) {
-          console.error("Database tracking error inside NextAuth jwt callback:", error.message);
+          console.error("Database tracking error inside NextAuth jwt callback:", error.message, ": This error is in the api/auth/authts file");
         }
       }
       return token;

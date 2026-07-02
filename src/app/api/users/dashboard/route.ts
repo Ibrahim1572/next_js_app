@@ -109,11 +109,11 @@ export async function GET(){
         }
 
         // FIXED: Explicitly matches response structure key expected by client
-        return NextResponse.json({ 'data': chartData });
+        return NextResponse.json({ 'data': chartData, status:200, success: true });
         
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error: any) {
-        return NextResponse.json({ info: "Got error in view all api route", message: error.message, status: 500, success: false });
+        return NextResponse.json({ message: "Got error in view all api route", error: error.message, status: 500, success: false });
     }
 }

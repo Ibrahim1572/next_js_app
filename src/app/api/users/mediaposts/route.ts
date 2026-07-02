@@ -28,7 +28,7 @@ export async function POST(request: NextRequest){
         
         if (!tokenCookie) {
             cookieType=""
-            return NextResponse.json({ message: "Token cookie not found" }, { status: 401 });   
+            return NextResponse.json({ message: "Token cookie not found", status: 401, message: 'Unauthorized user' });   
         }
                     
         
@@ -49,15 +49,7 @@ export async function POST(request: NextRequest){
                 extractedUserEmail = session.user.email;
                 }
         }
-        // console.log(`decoded Token: ${decodedToken}`)
-        // console.log(`extracted user Id: ${extractedUserId}`)
-
-        // console.log(extractedUserId)
-        // console.log(typeof extractedUserId)
-        // const id= await User.findById(extractedUserId)
-        // if(!id){
-        //     return NextResponse.json({message: "only existing users can post", status: 401})
-        // }
+    
         const dateNow= new Date()
         const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": extractedUserEmail, 'deletedDate':dateNow})
         const savedPost=await newPost.save()
@@ -67,7 +59,7 @@ export async function POST(request: NextRequest){
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
-        return NextResponse.json({info: "Got error in post upload api route",message: error.message, status:500, success:false})
+        return NextResponse.json({message: "Got error in post upload api route", error: error.message, status:500, success:false})
     }
 }
 
@@ -78,10 +70,10 @@ export async function GET(){
         if(!allPosts){
             return NextResponse.json({info: "No posts, (DB is empty)", success:true})
         }
-        return NextResponse.json({info: "Posts retrieved", success:true, posts: allPosts})
+        return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts})
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
-        return NextResponse.json({info: "Got error in view all api route", message: error.message, status:500, success:false})
+        return NextResponse.json({message: "Got error in view all api route", error: error.message, status:500, success:false})
     }
 }

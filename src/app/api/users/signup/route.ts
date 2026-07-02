@@ -8,11 +8,6 @@ export async function POST(request: NextRequest){
     try {
         const reqBody= await request.json()
         const{email, userName, password}=reqBody
-        // const emailLower=email.toLowerCase()
-
-        // if(password!==confirmPassword){
-        //     return NextResponse.json({error: "password and conform password don't match", status:400})
-        // }
 
         const user= await User.findOne({email})
         console.log(user)
@@ -24,10 +19,10 @@ export async function POST(request: NextRequest){
         const savedUser=await newUser.save()
         console.log(savedUser)
 
-        return NextResponse.json({message: 'user registerd sucessfully', savedUser, success: true})
+        return NextResponse.json({message: 'user registerd sucessfully', User:savedUser, success: true, status:200})
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
-        return NextResponse.json({error: error.message, message:'last'})
+        return NextResponse.json({error: error.message, message:'This is an error from the signup api route', status: 500})
     }
 }

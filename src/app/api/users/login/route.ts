@@ -14,11 +14,11 @@ export async function POST(request: NextRequest){
         
         if(!dbUser){
             console.log("dbUser is null/wrong email/user not exists")
-            return NextResponse.json({message: "Not loggd in, dbUser is null/wrong email/user not exists", status :400, dbUser})
+            return NextResponse.json({message: "Not loggd in, dbUser is null/wrong email/user not exists", status :409, User:dbUser})
         }
         if(dbUser.password!==password){
             console.log("wrong password")
-            return NextResponse.json({message: "Wrong Password", status :400, dbUser})
+            return NextResponse.json({message: "Wrong Password", status :401, User:dbUser})
         }
         console.log('Login Sucessful')
 
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest){
         console.log(`Secret key= ${tk_secret}`)
         const token= jwt.sign(tokenData, tk_secret, {expiresIn: '1d'})
 
-        const response= NextResponse.json({message: 'user loggedIN sucessfully: ', success: true})
+        const response= NextResponse.json({message: 'user loggedIN sucessfully: ', success: true, status:200, User:dbUser})
         response.cookies.set('token', token, {httpOnly:true})
 
         console.log(response.cookies)
