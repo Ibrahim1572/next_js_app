@@ -44,9 +44,9 @@ function Page(){
         console.log(response)
     }
 
-    const viewAll=async()=>{
+    const viewAll=async(isDeleted:string)=>{
         setPostData([])
-        const temp=await axios.get('/api/users/mediaposts')
+        const temp=await axios.get('/api/users/mediaposts?deleted='+isDeleted)
         setPostData(temp.data.posts)
         if(temp.data.status===200){
             toast.success(temp.data.toastMessage)
@@ -59,7 +59,13 @@ function Page(){
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const searchPost=async(formData: any)=>{
         const searchTitle=formData.get('title').trim()
-        const temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle))
+        let temp
+        if(currentView==='restorePost'){
+            temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=true')
+        }
+        else{
+            temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=false')
+        }
         setPostDataOne(temp.data.post)
         if(temp.data.status===200){
             toast.success(temp.data.toastMessage)
@@ -96,7 +102,18 @@ function Page(){
 
     const deletePost=async()=>{
         const oldTitle = postDataOne?.postTitle 
-        const response= await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle))
+        const response= await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle)+'deleted=false')
+        if(response.data.status===200){
+            toast.success(response.data.toastMessage)
+        }
+        else{
+            toast.error(response.data.toastMessage)
+        }
+    }
+
+    const restorePost=async()=>{
+        const oldTitle = postDataOne?.postTitle 
+        const response= await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle)+'deleted=true')
         if(response.data.status===200){
             toast.success(response.data.toastMessage)
         }
@@ -330,45 +347,7 @@ function Page(){
                     </>
                     
                 )
-            case 'addPost' : 
-                return(
-                    <form action={addPost} className="flex flex-col space-y-5 justify-center items-center" >
-                    <h1>Add a Post</h1>
-                    {/* Email Input Group */}
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">
-                            Enter Post title:
-                        </label>
-                        <input 
-                            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                            placeholder="title" 
-                            required 
-                            name="title"
-                        />
-                    </div>
-
-                    {/* Password Input Group */}
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">
-                            Enter Post body:
-                        </label>
-                        <input 
-                            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                            placeholder="body" 
-                            required  
-                            name="body"
-                        />
-                    </div>
-
-                    {/* Primary Submit Button */}
-                    <button
-                        type="submit"
-                        className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                    >
-                        Post
-                    </button>
-                </form>
-                )
+                
 
             case 'dashboard':
                 return (
@@ -428,14 +407,124 @@ function Page(){
                     </div>
                 );
 
+            case 'viewArchivedPosts':
+                return(
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 justify-center items-center w-full p-4'>
+                        {postData && postData.length > 0 ? (
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            postData.map(function(item: any) {
+                                return (
+                                    <div key={item._id} className='p-4 outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                        <h3 className="text-xl font-bold mb-2">{item.postTitle}</h3>
+                                        <p className="text-sm text-slate-300 font-normal">{item.postBody}</p>
+                                        <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
+                                            <span>Likes: {item.postLikes}</span>
+                                            <span>Created: {new Date(item.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                    
+                                )
+                            })
+                        ) : (
+                            <div className="col-span-full text-center text-slate-400">No posts found or loading...</div>
+                        )}
+                    </div>
+                )
 
-            default:
+            case 'restorePost':
                 return (
-                    <header className="flex flex-col w-full items-center">
-                        <h1 className="p-4 text-xl font-bold">
-                            Old Dashboard
-                        </h1>
+                    <>
+                    <header>
+                        <form action={searchPost} className="flex flex-col space-y-5 justify-center items-center" >
+                            <h1>Restore a Post</h1>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                               Enter Post title:
+                            </label>
+                            <input 
+                                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                placeholder="title" 
+                                required 
+                                name="title"
+                            />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                            >
+                                Search
+                            </button>
+                        </form>
+
                     </header>
+                    <div className='flex justify-center items-center w-full p-4'>
+                        {postDataOne ? (
+                            <form action={restorePost}>
+                            <div key={postDataOne?._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                <h1>Post</h1>
+                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne?.postTitle}</h3>
+                                <p className="text-base text-slate-300 font-normal">{postDataOne?.postBody}</p>
+                                
+                                {/* Optional: Add metadata fields if you want to show them */}
+                                <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
+                                    <span>Likes: {postDataOne?.postLikes}</span>
+                                    <span>Created: {new Date(postDataOne?.createdAt).toLocaleDateString()}</span>
+                                    <span>Deleted: {new Date(postDataOne?.deletedDate).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                            >
+                                Restore Post
+                            </button>
+                            </form>
+                        ) : (
+                            <div className="text-center text-slate-400 font-normal">No post found</div>
+                        )}
+                    </div>
+                    </>
+                    
+                )
+            
+            default:
+                return(
+                    <form action={addPost} className="flex flex-col space-y-5 justify-center items-center" >
+                    <h1>Add a Post</h1>
+                    {/* Email Input Group */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">
+                            Enter Post title:
+                        </label>
+                        <input 
+                            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            placeholder="title" 
+                            required 
+                            name="title"
+                        />
+                    </div>
+
+                    {/* Password Input Group */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">
+                            Enter Post body:
+                        </label>
+                        <input 
+                            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            placeholder="body" 
+                            required  
+                            name="body"
+                        />
+                    </div>
+
+                    {/* Primary Submit Button */}
+                    <button
+                        type="submit"
+                        className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                    >
+                        Post
+                    </button>
+                </form>
                 );
         }
     }
@@ -452,25 +541,17 @@ function Page(){
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-8 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={goToLogout}>Logout</div>
             </header>
 
-
-
-
-
-
             <header className='flex flex-row '>
-                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView(''); }}>Dashboard</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){getGraphData();setCurrentView('dashboard'); }}>Analytic Dashboard</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('addPost'); }}>Add Post</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewOne'); }}>View One Post</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll()}}>View All Posts</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('updatePost');}}>Update Post</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Delete Post</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){getGraphData();setCurrentView('dashboard'); }}>Analytic Dashboard</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('addPost'); }}>Add Post</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewOne'); }}>View One Post</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll('false')}}>View All Posts</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('updatePost');}}>Update Post</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Delete Post</div>
+                <div className='size-9 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewArchivedPosts'); viewAll('true')}}>View Archived Posts</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Restore Post</div>
+
             </header>
-
-
-
-
-
 
             <header className="w-full flex justify-center">
                 <div className='flex h-auto w-full max-w-5xl p-4 outline-2 bg-blue-300/30 rounded-xl mx-4 my-8 items-center justify-center'>

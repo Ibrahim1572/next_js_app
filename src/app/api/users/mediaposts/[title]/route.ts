@@ -12,6 +12,7 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, context: RouteParams){
     await db_connection();
+    
     try {
         // const reqBody=await request.json()
         const {title}=await context.params

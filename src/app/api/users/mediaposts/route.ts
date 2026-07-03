@@ -63,14 +63,28 @@ export async function POST(request: NextRequest){
     }
 }
 
-export async function GET(){
+export async function GET(request: NextRequest){
     await db_connection();
+    const searchParams = request.nextUrl.searchParams;        
+    const isDeleted = searchParams.get('deleted')
+    let state=false
+    isDeleted==='true'?state=true:state=false
+
     try {
-        const allPosts=await Posts.find({isdeleted:false}).sort({updatedAt: -1}).limit(20)
-        if(!allPosts){
-            return NextResponse.json({info: "No posts, (DB is empty)", success:true, toastMessage:'No Posts to Load'})
+        if(!state){
+            const allPosts=await Posts.find({isdeleted:false}).sort({updatedAt: -1}).limit(20)
+            if(!allPosts){
+                return NextResponse.json({info: "No posts, (DB is empty)", success:true, toastMessage:'No Posts to Load'})
+            }
+            return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Posts Retrieved'})
         }
-        return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Posts Retrieved'})
+        else if(state){
+            const allPosts=await Posts.find({isdeleted:true}).sort({updatedAt: -1}).limit(20)
+            if(!allPosts){
+                return NextResponse.json({info: "No archivedposts, (DB is empty)", success:true, toastMessage:'No Archived Posts to Load'})
+            }
+            return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Archived Posts Retrieved'})
+        }
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error:any) {
