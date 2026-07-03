@@ -37,6 +37,7 @@ export async function GET(){
         const minDateUpdate = new Date();
         maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
         minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
+        let postUpdateCount=0
 
         for(let i = 0; i < 8; i++){
             const posts = await Posts.find({
@@ -53,7 +54,10 @@ export async function GET(){
                 }
             });
 
-            updatedData[i] = posts.length;
+            for(let i=0; i<posts.length; i++){
+                postUpdateCount+=posts[i].updateCount
+            }
+            updatedData[i] = postUpdateCount;
 
             minUp += 4;
             maxUp += 4;

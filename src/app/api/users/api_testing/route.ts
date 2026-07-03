@@ -10,16 +10,22 @@ export async function PATCH() {
             {
                 // Filter: find documents where these new fields do not exist yet
                 $or: [
-                    { isdeleted: { $exists: false } },
-                    { deletedDate: { $exists: false } }
+                    { updateCount: { $exists: false } },
+                    { restoreDate: { $exists: false } }
                 ]
             },
             [
                 // Aggregation pipeline stage allows referencing existing field values
                 {
                     $set: {
-                        isdeleted: false,
-                        deletedDate: "$createdAt" // Dynamically copies the unique creation date of each post
+                        updateCount: {
+                            $cond: {
+                                if: { $eq: ["$createdAt", "$updatedAt"] },
+                                then: 0,
+                                else: 1
+                            }
+                        },
+                        restoreDate: "$createdAt" // Dynamically copies the unique creation date of each post
                     }
                 }
             ],

@@ -28,6 +28,13 @@ const postsSchema=mongoose.Schema({
     },
     deletedDate:{
         type: Date
+    },
+    updateCount:{
+        type: Number,
+        default: 0
+    },
+    restoreDate:{
+        type: Date
     }
 },
     {

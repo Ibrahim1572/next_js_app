@@ -60,6 +60,7 @@ function Page(){
     const searchPost=async(formData: any)=>{
         const searchTitle=formData.get('title').trim()
         let temp
+        console.log(`current view: ${currentView}`)
         if(currentView==='restorePost'){
             temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=true')
         }
@@ -102,7 +103,7 @@ function Page(){
 
     const deletePost=async()=>{
         const oldTitle = postDataOne?.postTitle 
-        const response= await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle)+'deleted=false')
+        const response= await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle)+'?deleted=false')
         if(response.data.status===200){
             toast.success(response.data.toastMessage)
         }
@@ -113,7 +114,7 @@ function Page(){
 
     const restorePost=async()=>{
         const oldTitle = postDataOne?.postTitle 
-        const response= await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle)+'deleted=true')
+        const response= await axios.post('/api/users/mediaposts/'+encodeURIComponent(oldTitle)+'?deleted=true')
         if(response.data.status===200){
             toast.success(response.data.toastMessage)
         }
@@ -467,7 +468,7 @@ function Page(){
                                 
                                 {/* Optional: Add metadata fields if you want to show them */}
                                 <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
-                                    <span>Likes: {postDataOne?.postLikes}</span>
+                                    {/* <span>Likes: {postDataOne?.postLikes}</span> */}
                                     <span>Created: {new Date(postDataOne?.createdAt).toLocaleDateString()}</span>
                                     <span>Deleted: {new Date(postDataOne?.deletedDate).toLocaleDateString()}</span>
                                 </div>
@@ -533,8 +534,6 @@ function Page(){
     return (
         <div className='flex flex-col grow bg-blue-950 font-[roboto] font-bold text-white'>
 
-
-
             <header className='flex flex-row '>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-8 my-8 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={goToProfile}>Profile</div>
                 <div className='text-white grow-19 text-6xl flex items-center justify-center p-4'>Media Posts</div>
@@ -549,7 +548,7 @@ function Page(){
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('updatePost');}}>Update Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Delete Post</div>
                 <div className='size-9 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewArchivedPosts'); viewAll('true')}}>View Archived Posts</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Restore Post</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('restorePost');}}>Restore Post</div>
 
             </header>
 

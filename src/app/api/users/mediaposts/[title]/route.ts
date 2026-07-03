@@ -17,8 +17,18 @@ export async function GET(request: NextRequest, context: RouteParams){
         // const reqBody=await request.json()
         const {title}=await context.params
         const decodedTitle=decodeURIComponent(title);
+        const searchParams = request.nextUrl.searchParams;        
+        const isDeleted = searchParams.get('deleted')
+        let state=false
+        isDeleted==='true'?state=true:state=false
+        let dbPost
 
-        const dbPost= await Posts.findOne({postTitle: decodedTitle, isdeleted:false})||""
+        if(state){
+            dbPost= await Posts.findOne({postTitle: decodedTitle, isdeleted:true})||""
+        }
+        else{
+            dbPost= await Posts.findOne({postTitle: decodedTitle, isdeleted:false})||""
+        }
 
         if(!dbPost){
             return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404, toastMessage: 'Post Not Found'})
@@ -32,62 +42,123 @@ export async function GET(request: NextRequest, context: RouteParams){
     }
 }
 
-//delete post api 
+//delete and restore post api 
 export async function POST(request :NextRequest, context: RouteParams){
     await db_connection();
+    const searchParams = request.nextUrl.searchParams;        
+    const isDeleted = searchParams.get('deleted')
+    let state=false
+    isDeleted==='true'?state=true:state=false
     try {
-        const cookieStore=cookies();
-        let extractedUserEmail=""
-        let cookieType='jwt'
-        let tokenCookie=(await cookieStore).get('token');
-        
-        if(!tokenCookie){
-            tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
-            cookieType='nextAuth'
+        if (state===false) {
+            const cookieStore=cookies();
+            let extractedUserEmail=""
+            let cookieType='jwt'
+            let tokenCookie=(await cookieStore).get('token');
+            
+            if(!tokenCookie){
+                tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+                cookieType='nextAuth'
+            }
+            if(!tokenCookie){
+                tokenCookie=(await cookieStore).get('next-auth.session-token')
+                cookieType='nextAuth'
+            }
+                    
+            if (!tokenCookie) {
+                return NextResponse.json({ message: "Token cookie not found, user is not logged in", status: 401, toastMessage:'No user logged In: UNAUTHORIZED ACCESS' });                
+            }
+
+            if(cookieType==='jwt'){
+                        const tokenValue = tokenCookie.value;
+                        const decodedToken= jwtDecode(tokenValue);
+                        extractedUserEmail = decodedToken.email;
+                    }
+            
+                    if(cookieType==='nextAuth'){
+                        const session = await getServerSession(authOptions);
+            
+                        if (session && session.user && session.user.email) {
+                            extractedUserEmail = session.user.email;
+                            }
+                    }
+
+
+            // get title
+            const {title}=await context.params
+            const decodedTitle=decodeURIComponent(title);
+
+            const dbPost= await Posts.findOne({postTitle: decodedTitle})||""
+
+            if(!dbPost){
+                return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404, toastMessage: 'Post Not Found'})
+            }
+
+            const dbId=await dbPost.postedBy
+
+            //check db post and logged in user is same
+            if(extractedUserEmail!==dbId){
+                return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401, toastMessage:"INVALID ACTION: You can not delete soemone else's post"})
+            }
+            const dateNow=new Date()
+            const restoredPost= await Posts.findOneAndUpdate({postTitle: decodedTitle, isdeleted:false}, {$set:{isdeleted:true, deletedDate:dateNow}})
+            return NextResponse.json({post: restoredPost, success: true, message: 'Post deleted permanently', status:200, toastMessage: 'Post Restored Successfully'})
+            
+        } 
+        else if(state===true){
+            const cookieStore=cookies();
+            let extractedUserEmail=""
+            let cookieType='jwt'
+            let tokenCookie=(await cookieStore).get('token');
+            
+            if(!tokenCookie){
+                tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+                cookieType='nextAuth'
+            }
+            if(!tokenCookie){
+                tokenCookie=(await cookieStore).get('next-auth.session-token')
+                cookieType='nextAuth'
+            }
+                    
+            if (!tokenCookie) {
+                return NextResponse.json({ message: "Token cookie not found, user is not logged in", status: 401, toastMessage:'No user logged In: UNAUTHORIZED ACCESS' });                
+            }
+
+            if(cookieType==='jwt'){
+                        const tokenValue = tokenCookie.value;
+                        const decodedToken= jwtDecode(tokenValue);
+                        extractedUserEmail = decodedToken.email;
+                    }
+            
+                    if(cookieType==='nextAuth'){
+                        const session = await getServerSession(authOptions);
+            
+                        if (session && session.user && session.user.email) {
+                            extractedUserEmail = session.user.email;
+                            }
+                    }
+
+
+            // get title
+            const {title}=await context.params
+            const decodedTitle=decodeURIComponent(title);
+
+            const dbPost= await Posts.findOne({postTitle: decodedTitle})||""
+
+            if(!dbPost){
+                return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404, toastMessage: 'Post Not Found'})
+            }
+
+            const dbId=await dbPost.postedBy
+
+            //check db post and logged in user is same
+            if(extractedUserEmail!==dbId){
+                return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401, toastMessage:"INVALID ACTION: You can not delete soemone else's post"})
+            }
+            const dateNow=new Date()
+            const deletedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle, isdeleted:true}, {$set:{isdeleted:false, restoreDate:dateNow}})
+            return NextResponse.json({post: deletedPost, success: true, message: 'Post deleted permanently', status:200, toastMessage: 'Post Deleted Successfully'})
         }
-        if(!tokenCookie){
-            tokenCookie=(await cookieStore).get('next-auth.session-token')
-            cookieType='nextAuth'
-        }
-                
-        if (!tokenCookie) {
-            return NextResponse.json({ message: "Token cookie not found, user is not logged in", status: 401, toastMessage:'No user logged In: UNAUTHORIZED ACCESS' });                
-        }
-
-        if(cookieType==='jwt'){
-                    const tokenValue = tokenCookie.value;
-                    const decodedToken= jwtDecode(tokenValue);
-                    extractedUserEmail = decodedToken.email;
-                }
-        
-                if(cookieType==='nextAuth'){
-                    const session = await getServerSession(authOptions);
-        
-                    if (session && session.user && session.user.email) {
-                        extractedUserEmail = session.user.email;
-                        }
-                }
-
-
-        // get title
-        const {title}=await context.params
-        const decodedTitle=decodeURIComponent(title);
-
-        const dbPost= await Posts.findOne({postTitle: decodedTitle})||""
-
-        if(!dbPost){
-            return NextResponse.json({message: `Post with "${title}" title Not Found`, status: 404, toastMessage: 'Post Not Found'})
-        }
-
-        const dbId=await dbPost.postedBy
-
-        //check db post and logged in user is same
-        if(extractedUserEmail!==dbId){
-            return NextResponse.json({success: false, message: "You can not delete soemone else's post", status: 401, toastMessage:"INVALID ACTION: You can not delete soemone else's post"})
-        }
-        const dateNow=new Date()
-        const deletedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle, isdeleted:false}, {$set:{isdeleted:true, deletedDate:dateNow}})
-        return NextResponse.json({post: deletedPost, success: true, message: 'Post deleted permanently', status:200, toastMessage: 'Post Deleted Successfully'})
         
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -116,7 +187,7 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         }
                 
         if (!tokenCookie) {
-            return NextResponse.json({ message: "Token cookie not found, like user is not logged in" }, { status: 401, toastMessage:'No user logged in: UNAUTORIZED ACCESS' });                
+            return NextResponse.json({ message: "Token cookie not found, like user is not logged in", toastMessage:'No user logged in: UNAUTORIZED ACCESS' }, { status: 401 });                
         }
 
         if(cookieType==='jwt'){
@@ -152,30 +223,30 @@ export async function PATCH(request :NextRequest, context: RouteParams){
 
         //get details from next request
         const reqBody=await request.json()
-        let {newPostTitle, newPostBody}=reqBody;
+        const {newTitle, newBody}=reqBody;
         
-        newPostTitle=newPostTitle.trim();
-        newPostBody=newPostBody.trim();
+        const newPostTitle=newTitle?.trim();
+        const newPostBody=newBody?.trim();
 
         // const oldPost=dbPost
         const oldPost=dbPost
-        let updatedPost=""
+        let updatedPost
 
         //check if both fields are empty
-        if(newPostTitle&&newPostBody ===""){
-            return NextResponse.json({success: false, message: "No field to change", status:422, toastMessage:'Enter either a title or a body'})
+        if(newPostTitle===""&&newPostBody ===""){
+            return NextResponse.json({success: false, message: "No field to change", status:422, toastMessage:'Enter either a title or a body'});
         }
         //for when only body needs changing
-        if(!newPostTitle){
-            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{postBody: newPostBody}, {new:true})||""
+        if(newPostTitle===""&&newPostBody !==""){
+            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{$set:{postBody: newPostBody}, $inc:{updateCount:1}}, {new:true});
         }
         // for only when the title needs changing
-        if(!newPostBody){
-            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{postTitle: newPostTitle}, {new:true})||""
+        if(newPostTitle!==""&&newPostBody ===""){
+            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle} ,{$set:{postTitle: newPostTitle}, $inc:{updateCount:1}}, {new:true});
         }
         // for when both need changing
-        if(newPostTitle&&newPostBody){
-            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{postTitle: newPostTitle, postBody: newPostBody}, {new:true})||""
+        if(newPostTitle!==""&&newPostBody !==""){
+            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{$set:{postTitle: newPostTitle, postBody: newPostBody}, $inc:{updateCount:1}}, {new:true});
         }
 
         
