@@ -223,16 +223,17 @@ export async function PATCH(request :NextRequest, context: RouteParams){
 
         //get details from next request
         const reqBody=await request.json()
-        const {newTitle, newBody}=reqBody;
+        const {newPostTitle: incomingTitle, newPostBody: incomingBody}=reqBody;
         
-        const newPostTitle=newTitle?.trim();
-        const newPostBody=newBody?.trim();
+        const newPostTitle = typeof incomingTitle === 'string' ? incomingTitle.trim() : "";
+        const newPostBody = typeof incomingBody === 'string' ? incomingBody.trim() : "";
 
         // const oldPost=dbPost
         const oldPost=dbPost
         let updatedPost
 
         //check if both fields are empty
+        
         if(newPostTitle===""&&newPostBody ===""){
             return NextResponse.json({success: false, message: "No field to change", status:422, toastMessage:'Enter either a title or a body'});
         }
