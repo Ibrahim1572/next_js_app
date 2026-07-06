@@ -6,6 +6,8 @@ import toast from 'react-hot-toast'
 
 function Page(){
     const router= useRouter()
+    const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
     const[user, setUser]= useState({
         username: "",
         password: "",
@@ -18,6 +20,7 @@ function Page(){
             email: formData.get('email').trim(),
             password: formData.get('password').trim()
         }
+        
         const response = await axios.post("/api/users/signup", data)
         if(response.data.status===200){
             toast.success(response.data.toastMessage)
@@ -29,6 +32,8 @@ function Page(){
         // alert("Signed up successfully!")
         goToLogin()
     }
+
+    const passwordCheck= password===confirmPassword
 
     function goToLogin(){
         router.push('/login')
@@ -45,8 +50,11 @@ function Page(){
                     <h1 className='p-0.5'>Enter Email:</h1>
                     <input className='border rounded p-0.5' placeholder={'Email'} required type='email' name='email'/>
                     <h1 className='p-0.5'>Enter Password:</h1>
-                    <input className='border rounded p-0.5' placeholder={'Password(******)'} required  type="password" name='password'/>
-                    <button className='flex flex-col justify-center p-0.5 border rounded hover:bg-yellow-300/75' type='submit'>Signup</button>
+                    <input className='border rounded p-0.5' placeholder={'Password'} required  type="password" name='password' value={password}/>
+                    <h1 className='p-0.5'>confirm Password:</h1>    
+                    <input className='border rounded p-0.5' placeholder={'Confirm Password'} required  type="password" name='confirmPassword' value={confirmPassword}/>
+                    <button className='flex flex-col justify-center p-0.5 border rounded hover:bg-yellow-300/75' type='submit' disabled={passwordCheck}>Signup</button>
+                    
                 </form>
                 <button className='border p-0.5 hover:bg-yellow-300/75 rounded' onClick={goToLogin} type='submit'>LogIn Instead</button>
             </div>
