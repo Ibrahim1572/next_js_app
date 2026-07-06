@@ -7,6 +7,31 @@ import toast from 'react-hot-toast'
 
 
 function Page(){
+
+    const [isAdmin, setIsAdmin]= useState(false)
+    async function getAdminCheckData() {
+        try {
+            const response = await axios.post('/api/users/profile')
+            const userType = response.data['User Data'].userType
+            
+            console.log(`response: ${userType}`)
+            
+            
+            if (userType === 'Admin') {
+                setIsAdmin(true)
+            } else {
+                setIsAdmin(false)
+            }
+        } catch (error) {
+            console.error("Failed to check admin status:", error)
+            setIsAdmin(false)
+        }
+    }
+    useEffect(function() {
+        getAdminCheckData()
+    }, [])
+    
+    
     const router=useRouter()
     
     const goToLogout= async()=>{
@@ -547,7 +572,10 @@ function Page(){
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll('false')}}>View All Posts</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('updatePost');}}>Update Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Delete Post</div>
-                <div className='size-9 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewArchivedPosts'); viewAll('true')}}>View Archived Posts</div>
+                {isAdmin?(
+                    <div className='size-9 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewArchivedPosts'); viewAll('true')}}>View Archived Posts</div>
+                ):(<div></div>)}
+                
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('restorePost');}}>Restore Post</div>
 
             </header>

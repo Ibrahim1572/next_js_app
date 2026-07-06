@@ -8,6 +8,7 @@ interface UserProfile {
     'User Data': {
         name: string;
         email: string;
+        userType: boolean;
     };
     status: number;
     toastMessage: string;
@@ -26,6 +27,7 @@ function Page(){
                     toast.error(response.data.toastMessage)
                 }
         setUserData(response.data)
+        console.log(userData)
         return response
     }
 
@@ -51,6 +53,7 @@ function Page(){
                 <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
                     <p><strong>Name:</strong> {userData['User Data'].name}</p>
                     <p><strong>Email:</strong> {userData['User Data'].email}</p>
+                    <p><strong>User Type:</strong> {userData['User Data'].userType}</p>
                 </div>
             ):(<div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
                     <p><strong></strong></p>

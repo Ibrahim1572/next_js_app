@@ -1,31 +1,23 @@
 import { db_connection } from '@/dbConfig/dbconfig';
-import Posts from '@/models/postsModels';
+import Users from '@/models/userModels';
 import { NextResponse } from 'next/server';
 
 export async function PATCH() {
     try {
         await db_connection();
 
-        const result = await Posts.updateMany(
+        const result = await Users.updateMany(
             {
                 // Filter: find documents where these new fields do not exist yet
                 $or: [
-                    { updateCount: { $exists: false } },
-                    { restoreDate: { $exists: false } }
+                    { isAdmin: { $exists: false } }
                 ]
             },
             [
                 // Aggregation pipeline stage allows referencing existing field values
                 {
                     $set: {
-                        updateCount: {
-                            $cond: {
-                                if: { $eq: ["$createdAt", "$updatedAt"] },
-                                then: 0,
-                                else: 1
-                            }
-                        },
-                        restoreDate: "$createdAt" // Dynamically copies the unique creation date of each post
+                        isAdmin: false // Dynamically copies the unique creation date of each post
                     }
                 }
             ],

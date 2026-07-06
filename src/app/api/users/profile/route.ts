@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextResponse, userAgentFromString } from "next/server";
 import { NextRequest} from "next/server";
 import {db_connection} from '@/dbConfig/dbconfig'
 import { jwtDecode } from "jwt-decode";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
-
+import User from '@/models/userModels'
 
 export async function POST(request: NextRequest){
     await db_connection();
@@ -14,6 +14,7 @@ export async function POST(request: NextRequest){
         const cookieStore=cookies();
         let extractedUserEmail;
         let extractedUserName;
+        // let extractedUserType;
         let cookieType='jwt'
 
         let tokenCookie=(await cookieStore).get('token')
@@ -31,6 +32,8 @@ export async function POST(request: NextRequest){
             return NextResponse.json({ message: "Token cookie not found", toastMessage: 'No user logged in: UNAUTHORIZED ACCESS' }, { status: 401 });
         }
 
+        
+
         if(cookieType==='jwt'){
                             const tokenValue = tokenCookie.value;
                             // console.log(`token cookie: ${tokenCookie}`)
@@ -44,6 +47,7 @@ export async function POST(request: NextRequest){
                             // console.log(typeof(decodedToken))
                             extractedUserEmail = decodedToken.email;
                             extractedUserName = decodedToken.name;
+                            
                             // console.log(extractedUserEmail)
                             // console.log(extractedUserName)
                         }
@@ -54,12 +58,17 @@ export async function POST(request: NextRequest){
                             if (session && session.user && session.user.email&&session.user.name) {
                                 extractedUserEmail = session.user.email;
                                 extractedUserName = session.user.name;
+                                
                                 }
                         }
 
+        const user=await User.findOne({email: extractedUserEmail})
+        const adminStatus = user.isAdmin
+        const extractedUserType = adminStatus?"Admin":"Standard User"
+        console.log(extractedUserType)
         
-        const userData={email:extractedUserEmail, name:extractedUserName}
-        console.log(userData)
+        const userData={email:extractedUserEmail, name:extractedUserName, userType: extractedUserType}
+        // console.log(userData)
         const response =NextResponse.json({'User Data': userData, status:200, toastMessage:'Data Retrieved Successfully'})
         return response        
     } 

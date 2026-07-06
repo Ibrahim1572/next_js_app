@@ -10,7 +10,7 @@ export async function POST(request: NextRequest){
         const reqBody= await request.json()
         const{email, password}=reqBody
 
-        console.log(email);
+        // console.log(email);
         const dbUser= await User.findOne({email})
         
         if(!dbUser){
@@ -22,22 +22,23 @@ export async function POST(request: NextRequest){
             return NextResponse.json({message: "Wrong Password", status :401, User:dbUser, toastMessage: 'Invalid Password'})
         }
         console.log('Login Sucessful')
+        // console.log(dbUser)
 
 
         const tokenData={
             name: dbUser.userName,
             email: dbUser.email
         }
-        console.log(`dbUser: ${dbUser}`)
-        console.log(`token data: ${tokenData}`)
+        // console.log(`dbUser: ${dbUser}`)
+        // console.log(`token data: ${tokenData}`)
         const tk_secret=process.env.SECRET_TOKEN || "Ibrahim";
-        console.log(`Secret key= ${tk_secret}`)
+        // console.log(`Secret key= ${tk_secret}`)
         const token= jwt.sign(tokenData, tk_secret, {expiresIn: '1d'})
 
         const response= NextResponse.json({message: 'user loggedIN sucessfully: ', success: true, status:200, User:dbUser, toastMessage: 'Login Successfull'})
         response.cookies.set('token', token, {httpOnly:true})
 
-        console.log(response.cookies)
+        // console.log(response.cookies)
         return response
 
     } 
