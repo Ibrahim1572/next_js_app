@@ -71,7 +71,8 @@ export async function POST(request :NextRequest, context: RouteParams){
 
             if(cookieType==='jwt'){
                         const tokenValue = tokenCookie.value;
-                        const decodedToken= jwtDecode(tokenValue);
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const decodedToken= jwtDecode(tokenValue) as any;
                         extractedUserEmail = decodedToken.email;
                     }
             
@@ -126,7 +127,8 @@ export async function POST(request :NextRequest, context: RouteParams){
 
             if(cookieType==='jwt'){
                         const tokenValue = tokenCookie.value;
-                        const decodedToken= jwtDecode(tokenValue);
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const decodedToken= jwtDecode(tokenValue) as any;
                         extractedUserEmail = decodedToken.email;
                     }
             
@@ -192,7 +194,8 @@ export async function PATCH(request :NextRequest, context: RouteParams){
 
         if(cookieType==='jwt'){
                     const tokenValue = tokenCookie.value;
-                    const decodedToken= jwtDecode(tokenValue);
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const decodedToken= jwtDecode(tokenValue)as any;
                     extractedUserEmail = decodedToken.email;
                 }
         

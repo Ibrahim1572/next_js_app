@@ -4,9 +4,18 @@ import {useRouter} from 'next/navigation'
 import {useState} from 'react'
 import toast from 'react-hot-toast'
 
+interface UserProfile {
+    'User Data': {
+        name: string;
+        email: string;
+    };
+    status: number;
+    toastMessage: string;
+}
+
 function Page(){
     const router=useRouter()
-    const [userData, setUserData] = useState()
+    const [userData, setUserData] = useState<UserProfile | null>(null)
 
     const getData=async()=>{
         const response = await axios.post("/api/users/profile")

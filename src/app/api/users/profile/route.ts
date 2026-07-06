@@ -36,7 +36,9 @@ export async function POST(request: NextRequest){
                             // console.log(`token cookie: ${tokenCookie}`)
                             // console.log(`token cookie: ${tokenCookie.value}`)
                             // console.log(jwtDecode(tokenCookie.value))
-                            const decodedToken= jwtDecode(tokenValue);
+                            
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            const decodedToken= jwtDecode(tokenValue) as any;
                             // console.log(decodedToken)
                             // console.log(decodedToken.email)
                             // console.log(typeof(decodedToken))

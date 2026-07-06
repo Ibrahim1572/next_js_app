@@ -34,7 +34,8 @@ export async function POST(request: NextRequest){
         
         if(cookieType==='jwt'){
             const tokenValue = tokenCookie.value;
-            const decodedToken= jwtDecode(tokenValue);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const decodedToken= jwtDecode(tokenValue) as any;
             extractedUserEmail = decodedToken.email;
         }
 
@@ -42,9 +43,9 @@ export async function POST(request: NextRequest){
             const session = await getServerSession(authOptions);
             console.log(`session: ${session}`)
             // console.log(`session value: ${session.value}`)
-            console.log(`session user: ${session.user}`)
-            console.log(`Stringified Session: ${JSON.stringify(session, null, 2)}`);
-            console.log(`session user email: ${session.user.email}`)
+            // console.log(`session user: ${session.user}`)
+            // console.log(`Stringified Session: ${JSON.stringify(session, null, 2)}`);
+            // console.log(`session user email: ${session.user.email}`)
             if (session && session.user && session.user.email) {
                 extractedUserEmail = session.user.email;
                 }
