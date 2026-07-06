@@ -12,8 +12,8 @@ export async function POST(request: NextRequest){
     try {console.log("------------------------------------------------------------------------")
 
         const cookieStore=cookies();
-        let extractedUserEmail=""
-        let extractedUserName=""
+        let extractedUserEmail;
+        let extractedUserName;
         let cookieType='jwt'
 
         let tokenCookie=(await cookieStore).get('token')
@@ -33,9 +33,17 @@ export async function POST(request: NextRequest){
 
         if(cookieType==='jwt'){
                             const tokenValue = tokenCookie.value;
+                            // console.log(`token cookie: ${tokenCookie}`)
+                            // console.log(`token cookie: ${tokenCookie.value}`)
+                            // console.log(jwtDecode(tokenCookie.value))
                             const decodedToken= jwtDecode(tokenValue);
+                            // console.log(decodedToken)
+                            // console.log(decodedToken.email)
+                            // console.log(typeof(decodedToken))
                             extractedUserEmail = decodedToken.email;
                             extractedUserName = decodedToken.name;
+                            // console.log(extractedUserEmail)
+                            // console.log(extractedUserName)
                         }
                 
                         if(cookieType==='nextAuth'){
@@ -49,6 +57,7 @@ export async function POST(request: NextRequest){
 
         
         const userData={email:extractedUserEmail, name:extractedUserName}
+        console.log(userData)
         const response =NextResponse.json({'User Data': userData, status:200, toastMessage:'Data Retrieved Successfully'})
         return response        
     } 

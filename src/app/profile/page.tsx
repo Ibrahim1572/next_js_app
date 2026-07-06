@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 function Page(){
     const router=useRouter()
-    const [userData, setUserData] = useState(null)
+    const [userData, setUserData] = useState()
 
     const getData=async()=>{
         const response = await axios.post("/api/users/profile")
@@ -16,9 +16,10 @@ function Page(){
                 else{
                     toast.error(response.data.toastMessage)
                 }
-        setUserData(response.data.dbUser)
+        setUserData(response.data)
         // console.log("-----------------------------------------------------------")
         // console.log(response.data)
+        // console.log(response.data['User Data'])
         return response
     }
 
@@ -42,8 +43,8 @@ function Page(){
             {/* Displaying the data if it exists */}
             {userData? (
                 <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                    <p><strong>Name:</strong> {userData.name}</p>
-                    <p><strong>Email:</strong> {userData.email}</p>
+                    <p><strong>Name:</strong> {userData['User Data'].name}</p>
+                    <p><strong>Email:</strong> {userData['User Data'].email}</p>
                 </div>
             ):(<div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
                     <p><strong></strong></p>
