@@ -26,9 +26,6 @@ function Page(){
                     toast.error(response.data.toastMessage)
                 }
         setUserData(response.data)
-        // console.log("-----------------------------------------------------------")
-        // console.log(response.data)
-        // console.log(response.data['User Data'])
         return response
     }
 
