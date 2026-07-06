@@ -234,6 +234,7 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         // const oldPost=dbPost
         const oldPost=dbPost
         let updatedPost
+        const currentTimestamp = new Date();
 
         //check if both fields are empty
         
@@ -242,15 +243,15 @@ export async function PATCH(request :NextRequest, context: RouteParams){
         }
         //for when only body needs changing
         if(newPostTitle===""&&newPostBody !==""){
-            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{$set:{postBody: newPostBody}, $inc:{updateCount:1}}, {new:true});
+            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle}, {$set:{postBody: newPostBody}, $push: { updateLog: currentTimestamp}});
         }
         // for only when the title needs changing
         if(newPostTitle!==""&&newPostBody ===""){
-            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle} ,{$set:{postTitle: newPostTitle}, $inc:{updateCount:1}}, {new:true});
+            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle} ,{$set:{postTitle: newPostTitle}, $push: { updateLog: currentTimestamp}});
         }
         // for when both need changing
         if(newPostTitle!==""&&newPostBody !==""){
-            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{$set:{postTitle: newPostTitle, postBody: newPostBody}, $inc:{updateCount:1}}, {new:true});
+            updatedPost= await Posts.findOneAndUpdate({postTitle: decodedTitle},{$set:{postTitle: newPostTitle, postBody: newPostBody}, $push: { updateLog: currentTimestamp}});
         }
 
         

@@ -1,33 +1,21 @@
 import { db_connection } from '@/dbConfig/dbconfig';
 import Users from '@/models/userModels';
+import Posts from '@/models/postsModels';
 import { NextResponse } from 'next/server';
 
 export async function PATCH() {
     try {
         await db_connection();
 
-        const result = await Users.updateMany(
-            {
-                // Filter: find documents where these new fields do not exist yet
-                $or: [
-                    { isAdmin: { $exists: false } }
-                ]
-            },
-            [
-                // Aggregation pipeline stage allows referencing existing field values
-                {
-                    $set: {
-                        isAdmin: false // Dynamically copies the unique creation date of each post
-                    }
-                }
-            ],
-            {
-                updatePipeline: true // required by Mongoose 9+ to allow pipeline-style updates
-            }
+        // Target all documents where the field exists, and remove just that field
+        const result = await Posts.updateMany(
+            { update: { $exists: true } }, // Filter: Find posts that have this field
+            { $unset: { updateCount: "" } },
+            { strict: false}    // Action: Completely delete the field from those documents
         );
 
         return NextResponse.json({
-            message: "Backfill complete",
+            message: "Fields successfully stripped from documents",
             matchedCount: result.matchedCount,
             modifiedCount: result.modifiedCount
         });
@@ -35,7 +23,7 @@ export async function PATCH() {
     } catch (error) {
         console.log(error);
         return NextResponse.json(
-            { error: "Backfill failed", details: (error as Error).message },
+            { error: "Field removal failed", details: (error as Error).message },
             { status: 500 }
         );
     }

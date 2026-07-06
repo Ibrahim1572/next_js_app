@@ -29,9 +29,9 @@ const postsSchema=mongoose.Schema({
     deletedDate:{
         type: Date
     },
-    updateCount:{
-        type: Number,
-        default: 0
+    updateLog:{
+        type: Array,
+        default: null
     },
     restoreDate:{
         type: Date

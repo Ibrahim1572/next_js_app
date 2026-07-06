@@ -29,42 +29,6 @@ export async function GET(){
             minDate.setDate(minDate.getDate() - min);
         }
 
-        const updatedData = [];
-        // FIXED: Resetting local bucket bounds specifically for the update loop
-        let minUp = 0;
-        let maxUp = 2;
-        const maxDateUpdate = new Date();
-        const minDateUpdate = new Date();
-        maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
-        minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
-        let postUpdateCount=0
-
-        for(let i = 0; i < 8; i++){
-            const posts = await Posts.find({
-                // FIXED: Querying updated lifecycle window fields
-                updatedAt: {
-                    $gte: maxDateUpdate,
-                    $lte: minDateUpdate
-                },
-                $expr: { 
-                    $and: [
-                        { $ne: ["$updatedAt", "$createdAt"] },
-                        { $ne: ["$updatedAt", "$deletedDate"] }
-                    ]
-                }
-            });
-
-            for(let i=0; i<posts.length; i++){
-                postUpdateCount+=posts[i].updateCount
-            }
-            updatedData[i] = postUpdateCount;
-
-            minUp += 4;
-            maxUp += 4;
-            maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
-            minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
-        }
-
         const deletedData = [];
         // FIXED: Resetting local bucket bounds specifically for the delete loop
         let minDel = 0;
@@ -96,6 +60,73 @@ export async function GET(){
             maxDateDelete.setDate(maxDateDelete.getDate() - maxDel);
             minDateDelete.setDate(minDateDelete.getDate() - minDel);
         }
+
+        const updatedData = [];
+        // FIXED: Resetting local bucket bounds specifically for the update loop
+        let minUp = 0;
+        let maxUp = 2;
+        const maxDateUpdate = new Date();
+        const minDateUpdate = new Date();
+        maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
+        minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
+        // let postUpdateCount=0
+        
+        const rawPosts= await Posts.find({})
+        const postLogs=[]
+        console.log('===================================================')
+
+        for(let i=0; i<rawPosts.length; i++){
+            for(let j=0; j<rawPosts[i].updateLog.length; j++){
+                postLogs.push(rawPosts[i].updateLog[j])
+            }
+        }
+
+       
+
+       
+        for(let x=0; x<8; x++){
+            const tempPost=[]
+            for(let y=0; y<postLogs.length; y++){
+                if(postLogs[y]>maxDateUpdate&&postLogs[y]<=minDateUpdate){
+                    tempPost.push(postLogs[y])
+                }
+            }
+            updatedData[x]=tempPost.length
+
+            minUp += 4;
+            maxUp += 4;
+            maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
+            minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
+        }
+
+        // console.log(updatedData)
+
+
+        // for(let i = 0; i < 8; i++){
+        //     const posts = await Posts.find({
+        //         // FIXED: Querying updated lifecycle window fields
+        //         updatedAt: {
+        //             $gte: maxDateUpdate,
+        //             $lte: minDateUpdate
+        //         },
+        //         $expr: { 
+        //             $and: [
+        //                 { $ne: ["$updatedAt", "$createdAt"] },
+        //                 { $ne: ["$updatedAt", "$deletedDate"] }
+        //             ]
+        //         }
+        //     });
+
+        //     for(let i=0; i<posts.length; i++){
+        //         postUpdateCount+=posts[i].updateCount
+        //     }
+        //     updatedData[i] = postUpdateCount;
+
+        //     minUp += 4;
+        //     maxUp += 4;
+        //     maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
+        //     minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
+        // }
 
         const dataBuckets = [
             '1-4 ago', '5-8 ago', '9-12 ago', '13-16 ago',
