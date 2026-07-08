@@ -5,6 +5,7 @@ import {jwtDecode} from 'jwt-decode'
 import {cookies} from 'next/headers'
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
+import { updatePost } from '@/schemas/mediaPostsSchema'
 interface RouteParams {
   params: Promise<{ title: string }>
 }
@@ -226,10 +227,24 @@ export async function PATCH(request :NextRequest, context: RouteParams){
 
         //get details from next request
         const reqBody=await request.json()
-        const {newPostTitle: incomingTitle, newPostBody: incomingBody}=reqBody;
+        const result= updatePost.safeParse(reqBody)
         
-        const newPostTitle = typeof incomingTitle === 'string' ? incomingTitle.trim() : "";
-        const newPostBody = typeof incomingBody === 'string' ? incomingBody.trim() : "";
+                if(!result.success){
+                    return NextResponse.json(
+                        {
+                            success: false, 
+                            message: 'Invalid Post Data', 
+                            error: result.error.flatten().fieldErrors, 
+                            status: 400
+                        })
+                }
+
+        const newPostTitle = result.data.title
+        const newPostBody = result.data.body
+        // const {newPostTitle: incomingTitle, newPostBody: incomingBody}=result;
+        
+        // const newPostTitle = typeof incomingTitle === 'string' ? incomingTitle.trim() : "";
+        // const newPostBody = typeof incomingBody === 'string' ? incomingBody.trim() : "";
 
         // const oldPost=dbPost
         const oldPost=dbPost

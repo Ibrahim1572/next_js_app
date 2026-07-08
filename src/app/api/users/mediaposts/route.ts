@@ -5,12 +5,30 @@ import {jwtDecode} from 'jwt-decode'
 import {cookies} from 'next/headers'
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
+import { addPost } from '@/schemas/mediaPostsSchema'
 
+//add post
 export async function POST(request: NextRequest){
     await db_connection();
     try {
+
         const reqBody=await request.json()
-        const {title, body}= reqBody;
+        const result= addPost.safeParse(reqBody)
+
+        if(!result.success){
+            return NextResponse.json(
+                {
+                    success: false, 
+                    message: 'Invalid Post Data', 
+                    error: result.error.flatten().fieldErrors, 
+                    status: 400
+                })
+        }
+        // console.log(`data: ${result}`)
+        // console.log(`data: ${typeof(result)}`)
+        // console.log(`data: ${result.data?.title}`)
+        const title= result.data?.title
+        const body= result.data?.body
 
         const cookieStore=cookies();
         let tokenCookie=(await cookieStore).get('token')
@@ -64,6 +82,7 @@ export async function POST(request: NextRequest){
     }
 }
 
+//get all posts
 export async function GET(request: NextRequest){
     await db_connection();
     const searchParams = request.nextUrl.searchParams;        

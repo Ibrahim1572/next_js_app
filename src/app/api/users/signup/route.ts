@@ -1,13 +1,29 @@
 import {db_connection} from '@/dbConfig/dbconfig'
 import User from '@/models/userModels'
 import { NextResponse, NextRequest } from 'next/server'
+import { signUpSchema } from '@/schemas/signUpSchema'
 
 
 export async function POST(request: NextRequest){
     await db_connection();
     try {
         const reqBody= await request.json()
-        const{email, userName, password}=reqBody
+        const result= signUpSchema.safeParse(reqBody)
+
+        if(!result.success){
+            return NextResponse.json(
+                {
+                    success: false, 
+                    message: 'Invalid Post Data', 
+                    error: result.error.flatten().fieldErrors, 
+                    status: 400
+                })
+        }
+                
+        const email = result.data.email
+        const userName = result.data.username
+        const password = result.data.password
+
 
         const user= await User.findOne({email})
         // console.log(user)

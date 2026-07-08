@@ -3,12 +3,26 @@ import User from '@/models/userModels'
 import { NextResponse, NextRequest } from 'next/server'
 import jwt from 'jsonwebtoken'
 import toast from 'react-hot-toast'
+import { logInSchema } from '@/schemas/logInSchema'
 
 export async function POST(request: NextRequest){
     await db_connection();
     try {
         const reqBody= await request.json()
-        const{email, password}=reqBody
+        const result= logInSchema.safeParse(reqBody)
+                
+                        if(!result.success){
+                            return NextResponse.json(
+                                {
+                                    success: false, 
+                                    message: 'Invalid Post Data', 
+                                    error: result.error.flatten().fieldErrors, 
+                                    status: 400
+                                })
+                        }
+                        
+        const email = result.data.email
+        const password = result.data.password
 
         // console.log(email);
         const dbUser= await User.findOne({email})
