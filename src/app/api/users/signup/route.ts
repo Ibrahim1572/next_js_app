@@ -2,27 +2,31 @@ import {db_connection} from '@/dbConfig/dbconfig'
 import User from '@/models/userModels'
 import { NextResponse, NextRequest } from 'next/server'
 import { signUpSchema } from '@/schemas/signUpSchema'
+import validateRequest from '../../validateRequest';
+import { z } from 'zod'
 
 
 export async function POST(request: NextRequest){
     await db_connection();
     try {
-        const reqBody= await request.json()
-        const result= signUpSchema.safeParse(reqBody)
+        // const reqBody= await request.json()
+        // const result= signUpSchema.safeParse(reqBody)
 
-        if(!result.success){
-            return NextResponse.json(
-                {
-                    success: false, 
-                    message: 'Invalid Post Data', 
-                    error: result.error.flatten().fieldErrors, 
-                    status: 400
-                })
-        }
+        // if(!result.success){
+        //     return NextResponse.json(
+        //         {
+        //             success: false, 
+        //             message: 'Invalid Post Data', 
+        //             error: result.error.flatten().fieldErrors, 
+        //             status: 400
+        //         })
+        // }
+
+        const result = await validateRequest(request.json(), signUpSchema) as z.infer<typeof signUpSchema>
                 
-        const email = result.data.email
-        const userName = result.data.username
-        const password = result.data.password
+        const email = result.email
+        const userName = result.username
+        const password = result.password
 
 
         const user= await User.findOne({email})

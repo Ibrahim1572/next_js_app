@@ -2,29 +2,37 @@ import {db_connection} from '@/dbConfig/dbconfig'
 import User from '@/models/userModels'
 import { NextResponse, NextRequest } from 'next/server'
 import jwt from 'jsonwebtoken'
-import toast from 'react-hot-toast'
 import { logInSchema } from '@/schemas/logInSchema'
+import validateRequest from '@/app/api/validateRequest'
+import { z } from 'zod'
 
 export async function POST(request: NextRequest){
     await db_connection();
     try {
-        const reqBody= await request.json()
-        const result= logInSchema.safeParse(reqBody)
-                
-                        if(!result.success){
-                            return NextResponse.json(
-                                {
-                                    success: false, 
-                                    message: 'Invalid Post Data', 
-                                    error: result.error.flatten().fieldErrors, 
-                                    status: 400
-                                })
-                        }
-                        
-        const email = result.data.email
-        const password = result.data.password
+
+        // const reqBody= await request.json()
+        
+        // const result= logInSchema.safeParse(reqBody)
+        
+        //                 if(!result.success){
+        //                     return NextResponse.json(
+        //                         {
+        //                             success: false, 
+        //                             message: 'Invalid Post Data', 
+        //                             error: result.error.flatten().fieldErrors, 
+        //                             status: 400
+        //                         })
+        //                 }
+        const result= await validateRequest(request.json(), logInSchema) as z.infer<typeof logInSchema>
+
+        // console.log(`result: ${typeof(result)}`)
+        // console.log(`result: ${result.data}`)
+        // console.log(`result: ${result.email}`)
+        const email = result.email
+        const password = result.password
 
         // console.log(email);
+        // console.log(password)
         const dbUser= await User.findOne({email})
         
         if(!dbUser){

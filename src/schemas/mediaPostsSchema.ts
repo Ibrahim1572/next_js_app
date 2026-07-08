@@ -13,3 +13,7 @@ export const updatePost=z.object({
 export const searchPost=z.object({
     title: z.string().trim().min(1).optional()
 })
+
+export const getOnePost=z.object({
+    title: z.string().trim().min(1)
+})

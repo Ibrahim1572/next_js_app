@@ -6,29 +6,32 @@ import {cookies} from 'next/headers'
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
 import { addPost } from '@/schemas/mediaPostsSchema'
+import validateRequest from '../../validateRequest';
+import {z} from 'zod'
 
 //add post
 export async function POST(request: NextRequest){
     await db_connection();
     try {
 
-        const reqBody=await request.json()
-        const result= addPost.safeParse(reqBody)
+        const result= await validateRequest(request, addPost) as z.infer<typeof addPost>
+        // const reqBody=await request.json()
+        // const result= addPost.safeParse(reqBody)
 
-        if(!result.success){
-            return NextResponse.json(
-                {
-                    success: false, 
-                    message: 'Invalid Post Data', 
-                    error: result.error.flatten().fieldErrors, 
-                    status: 400
-                })
-        }
+        // if(!result.success){
+        //     return NextResponse.json(
+        //         {
+        //             success: false, 
+        //             message: 'Invalid Post Data', 
+        //             error: result.error.flatten().fieldErrors, 
+        //             status: 400
+        //         })
+        // }
         // console.log(`data: ${result}`)
         // console.log(`data: ${typeof(result)}`)
         // console.log(`data: ${result.data?.title}`)
-        const title= result.data?.title
-        const body= result.data?.body
+        const title= result.title
+        const body= result.body
 
         const cookieStore=cookies();
         let tokenCookie=(await cookieStore).get('token')
@@ -93,7 +96,7 @@ export async function GET(request: NextRequest){
     try {
         if(!state){
             const allPosts=await Posts.find({isdeleted:false}).sort({updatedAt: -1}).limit(20)
-            if(!allPosts){
+            if(allPosts.length === 0){
                 return NextResponse.json({info: "No posts, (DB is empty)", success:true, toastMessage:'No Posts to Load'})
             }
             return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Posts Retrieved'})
