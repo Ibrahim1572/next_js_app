@@ -2,8 +2,8 @@
 import {useState, useEffect, useContext} from 'react'
 import axios from 'axios'
 import {useRouter} from 'next/navigation'
-import DataContextProvider from '@/context/DataContextProvider';
 import DataContext from '@/context/DataContext';
+import toast from 'react-hot-toast'
 
 import AddPost from './components/addPost'
 import Dashboard from './components/dashboard'
@@ -19,16 +19,31 @@ import ViewArchivedPosts from './components/viewArchivedPosts'
 function Page(){
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const {currentView} = useContext(DataContext) as any 
+    const {currentView} = useContext(DataContext) as any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {setCurrentView} = useContext(DataContext) as any 
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const {setPostData} = useContext(DataContext) as any
+
+
+    const viewAll=async(isDeleted:string)=>{
+            setPostData([])
+            const temp=await axios.get('/api/users/mediaposts?deleted='+isDeleted)
+            setPostData(temp.data.posts)
+            if(temp.data.status===200){
+                toast.success(temp.data.toastMessage)
+            }
+            else{
+                toast.error(temp.data.toastMessage)
+            }
+        }
     
 
     const [isAdmin, setIsAdmin]= useState(false)
     async function getAdminCheckData() {
         try {
-            // const response = await axios.post('/api/users/profile')
-            const userType = (await axios.post('/api/users/profile')).data['User Data'].userType || "Standard User"
+            const response = await axios.post('/api/users/profile')
+            const userType = response.data?.['User Data']?.userType ?? "Standard User"
             
             console.log(`response: ${userType}`)
             
@@ -102,11 +117,11 @@ function Page(){
                 <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('dashboard'); }}>Analytic Dashboard</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('addPost'); }}>Add Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewOne'); }}>View One Post</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); }}>View All Posts</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll('false') }}>View All Posts</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('updatePost');}}>Update Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Delete Post</div>
                 {isAdmin?(
-                    <div className='size-9 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewArchivedPosts'); }}>View Archived Posts</div>
+                    <div className='size-9 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewArchivedPosts'); viewAll('true')}}>View Archived Posts</div>
                 ):(<div></div>)}
                 
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('restorePost');}}>Restore Post</div>
@@ -116,9 +131,7 @@ function Page(){
             <header className="w-full flex justify-center">
                 <div className='flex h-auto w-full max-w-5xl p-4 outline-2 bg-blue-300/30 rounded-xl mx-4 my-8 items-center justify-center'>
                     <div className='w-full flex items-center justify-center p-4 text-white'>
-                        <DataContextProvider>
-                            {stateJSX()}
-                        </DataContextProvider>
+                        {stateJSX()}
                         
                     </div>
                     

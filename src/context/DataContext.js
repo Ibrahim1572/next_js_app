@@ -1,5 +1,6 @@
-import react from 'react'
+'use client'
+import {createContext} from 'react'
 
-const DataContext = react.createContext(null)
+const DataContext = createContext(null)
 
 export default DataContext

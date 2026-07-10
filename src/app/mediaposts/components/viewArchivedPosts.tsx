@@ -1,31 +1,15 @@
 'use client'
 import {useContext} from 'react'
-import axios from 'axios'
-import toast from 'react-hot-toast'
 import DataContext from '@/context/DataContext'
 
 export default function ViewArchivedPosts(){
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const {setPostData} = useContext(DataContext) as any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {postData} = useContext(DataContext) as any
 
-    const viewAll=async(isDeleted:string)=>{
-            setPostData([])
-            const temp=await axios.get('/api/users/mediaposts?deleted='+isDeleted)
-            setPostData(temp.data.posts)
-            if(temp.data.status===200){
-                toast.success(temp.data.toastMessage)
-            }
-            else{
-                toast.error(temp.data.toastMessage)
-            }
-        }
 
     return(
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 justify-center items-center w-full p-4'>
-                        {viewAll('true')}
                         {postData && postData.length > 0 ? (
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             postData.map(function(item: any) {

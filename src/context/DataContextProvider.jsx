@@ -1,3 +1,4 @@
+'use client'
 import react from 'react'
 import DataContext from '../context/DataContext'
 
