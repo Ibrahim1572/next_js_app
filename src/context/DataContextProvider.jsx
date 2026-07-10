@@ -2,7 +2,7 @@ import react from 'react'
 import DataContext from '../context/DataContext'
 
 export default function DataContextProvider({children }){
-    const [currentView, setCurrentView] = react.useState(null)
+    const [currentView, setCurrentView] = react.useState("addPost")
     const [postDataOne, setPostDataOne] = react.useState(null)
     const [postData, setPostData] = react.useState(null)
 
