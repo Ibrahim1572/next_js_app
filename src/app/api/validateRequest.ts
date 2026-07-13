@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { z } from 'zod'
 
 export default async function validateRequest<T>(data: unknown, schema: z.ZodSchema<T>) {
     try {
         
-        const result=schema.safeParse(data)
+        const result=schema.safeParse(await data)
 
         if(!result.success){
             return NextResponse.json({
