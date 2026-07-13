@@ -1,8 +1,8 @@
 
 import { NextResponse, NextRequest } from 'next/server'
 
-export async function POST(request :NextRequest){
-    try {
+export const POST= ((request :NextRequest)=>{
+    
         const response=NextResponse.json({message: 'Logged Out Successfully', success:true, status:200, toastMessage: 'Logged Out Successfully'})
         response.cookies.set('token', "", { 
             httpOnly: true, 
@@ -23,12 +23,4 @@ export async function POST(request :NextRequest){
         })
 
         return  response
-        
-    } 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    catch (error:any) {
-        return NextResponse.json({message: "got and error for login", 
-            error: error.message, status:500
-        })
-    }
-}
+})

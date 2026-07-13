@@ -8,28 +8,17 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
 import { addPost } from '@/schemas/mediaPostsSchema'
 import validateRequest from '../../validateRequest';
 import {z} from 'zod'
+import asyncHandler from '@/utils/asyncHandler' 
+import ApiError from '@/utils/ApiError'  
+import toastResponse from '@/utils/toastErrorWrapper'
 
 //add post
-export async function POST(request: NextRequest){
+export const POST= asyncHandler(async(request: NextRequest)=>{
     await db_connection();
-    try {
+    
 
         const result= await validateRequest(request, addPost) as z.infer<typeof addPost>
-        // const reqBody=await request.json()
-        // const result= addPost.safeParse(reqBody)
-
-        // if(!result.success){
-        //     return NextResponse.json(
-        //         {
-        //             success: false, 
-        //             message: 'Invalid Post Data', 
-        //             error: result.error.flatten().fieldErrors, 
-        //             status: 400
-        //         })
-        // }
-        // console.log(`data: ${result}`)
-        // console.log(`data: ${typeof(result)}`)
-        // console.log(`data: ${result.data?.title}`)
+        
         const title= result.title
         const body= result.body
 
@@ -49,7 +38,8 @@ export async function POST(request: NextRequest){
         
         if (!tokenCookie) {
             cookieType=""
-            return NextResponse.json({ message: "Token cookie not found", status: 401, toastMessage: 'Unauthorized user' });   
+            toastResponse('Unauthorized user')
+            throw new ApiError(401, "Token cookie not found")
         }
                     
         
@@ -62,11 +52,8 @@ export async function POST(request: NextRequest){
 
         if(cookieType==='nextAuth'){
             const session = await getServerSession(authOptions);
-            console.log(`session: ${session}`)
-            // console.log(`session value: ${session.value}`)
-            // console.log(`session user: ${session.user}`)
-            // console.log(`Stringified Session: ${JSON.stringify(session, null, 2)}`);
-            // console.log(`session user email: ${session.user.email}`)
+            // console.log(`session: ${session}`)
+           
             if (session && session.user && session.user.email) {
                 extractedUserEmail = session.user.email;
                 }
@@ -78,26 +65,21 @@ export async function POST(request: NextRequest){
         
         return NextResponse.json({post: savedPost, success:true, message:"Post added", status:200, toastMessage:'Post added Successfully'})
 
-    } 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    catch (error:any) {
-        return NextResponse.json({message: "Got error in post upload api route", error: error.message, status:500, success:false})
-    }
-}
+    })
 
 //get all posts
-export async function GET(request: NextRequest){
+export const GET= asyncHandler(async(request: NextRequest)=>{
     await db_connection();
     const searchParams = request.nextUrl.searchParams;        
     const isDeleted = searchParams.get('deleted')
     let state=false
     isDeleted==='true'?state=true:state=false
 
-    try {
         if(!state){
             const allPosts=await Posts.find({isdeleted:false}).sort({updatedAt: -1}).limit(20)
             if(allPosts.length === 0){
-                return NextResponse.json({info: "No posts, (DB is empty)", success:true, toastMessage:'No Posts to Load'})
+                toastResponse('No Posts to Load')
+                throw new ApiError(200, 'No posts, (DB is empty)')
             }
             return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Posts Retrieved'})
         }
@@ -108,9 +90,4 @@ export async function GET(request: NextRequest){
             }
             return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Archived Posts Retrieved'})
         }
-    } 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    catch (error:any) {
-        return NextResponse.json({message: "Got error in view all api route", error: error.message, status:500, success:false})
-    }
-}
+})

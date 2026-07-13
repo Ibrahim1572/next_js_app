@@ -1,10 +1,10 @@
 import { db_connection } from '@/dbConfig/dbconfig';
 import Posts from '@/models/postsModels';
 import { NextResponse } from 'next/server';
+import asyncHandler from '@/utils/asyncHandler' 
 
-export async function GET(){
+export const GET = asyncHandler(async()=>{
     await db_connection();
-    try {
         const createdData = [];
         let min = 0;
         let max = 2;
@@ -14,8 +14,6 @@ export async function GET(){
             maxDate.setDate(maxDate.getDate() - (i * 4 + 4));
             const minDate = new Date();
             minDate.setDate(minDate.getDate() - (i * 4));
-
-
 
             const posts = await Posts.find({
                 createdAt: {
@@ -103,35 +101,6 @@ export async function GET(){
             minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
         }
 
-        // console.log(updatedData)
-
-
-        // for(let i = 0; i < 8; i++){
-        //     const posts = await Posts.find({
-        //         // FIXED: Querying updated lifecycle window fields
-        //         updatedAt: {
-        //             $gte: maxDateUpdate,
-        //             $lte: minDateUpdate
-        //         },
-        //         $expr: { 
-        //             $and: [
-        //                 { $ne: ["$updatedAt", "$createdAt"] },
-        //                 { $ne: ["$updatedAt", "$deletedDate"] }
-        //             ]
-        //         }
-        //     });
-
-        //     for(let i=0; i<posts.length; i++){
-        //         postUpdateCount+=posts[i].updateCount
-        //     }
-        //     updatedData[i] = postUpdateCount;
-
-        //     minUp += 4;
-        //     maxUp += 4;
-        //     maxDateUpdate.setDate(maxDateUpdate.getDate() - maxUp);
-        //     minDateUpdate.setDate(minDateUpdate.getDate() - minUp);
-        // }
-
         const dataBuckets = [
             '1-4 ago', '5-8 ago', '9-12 ago', '13-16 ago',
             '17-20 ago', '21-24 ago', '25-28 ago', '29-32 ago'
@@ -146,12 +115,6 @@ export async function GET(){
                 'deleted': deletedData[i]
             });
         }
-
         return NextResponse.json({ 'data': chartData, status:200, success: true, toastMessage: 'Data Retrieved' });
         
-    } 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    catch (error: any) {
-        return NextResponse.json({ message: "Got error in view all api route", error: error.message, status: 500, success: false });
-    }
-}
+    })

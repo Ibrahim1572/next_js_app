@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "src/app/mediaposts/page.tsx", "src/context/DataContextProvider.tsx", "src/context/DataContext.ts"  ],
+, "src/app/mediaposts/page.tsx", "src/context/DataContextProvider.tsx", "src/context/DataContext.ts", "src/utils/ApiError.js"  ],
   "exclude": ["node_modules"]
 }
