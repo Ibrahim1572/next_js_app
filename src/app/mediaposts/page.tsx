@@ -24,7 +24,30 @@ function Page(){
     const {setCurrentView} = useContext(DataContext) as any 
      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {setPostData} = useContext(DataContext) as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const {setChartGraphData} = useContext(DataContext) as any
 
+    
+
+    const getGraphData=async()=>{
+        // const data=await axios.get('/api/users/dashboard')|| []
+        // console.log(`data: ${data}`)
+        // return data.data
+
+        const response = await axios.get('/api/users/dashboard')
+        if (response.data && response.data['data']) {
+            setChartGraphData(response.data['data']);
+        if(response.data.status===200){
+            toast.success(response.data.toastMessage)
+        }
+        else{
+            toast.error(response.data.toastMessage)
+        }
+    }}
+
+    useEffect(function() {
+            getGraphData();
+        },[]);
 
     const viewAll=async(isDeleted:string)=>{
             setPostData([])
@@ -42,8 +65,7 @@ function Page(){
     const [isAdmin, setIsAdmin]= useState(false)
     async function getAdminCheckData() {
         try {
-            const response = await axios.post('/api/users/profile')
-            const userType = response.data?.['User Data']?.userType ?? "Standard User"
+            const userType = (await axios.post('/api/users/profile')).data?.['User Data']?.userType ?? "Standard User"
             
             console.log(`response: ${userType}`)
             
@@ -114,7 +136,7 @@ function Page(){
             </header>
 
             <header className='flex flex-row '>
-                <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('dashboard'); }}>Analytic Dashboard</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('dashboard'); getGraphData()}}>Analytic Dashboard</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('addPost'); }}>Add Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewOne'); }}>View One Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll('false') }}>View All Posts</div>

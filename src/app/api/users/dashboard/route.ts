@@ -8,12 +8,15 @@ export async function GET(){
         const createdData = [];
         let min = 0;
         let max = 2;
-        const maxDate = new Date();
-        const minDate = new Date();
-        maxDate.setDate(maxDate.getDate() - max);
-        minDate.setDate(minDate.getDate() - min);
 
         for(let i = 0; i < 8; i++){
+            const maxDate = new Date();
+            maxDate.setDate(maxDate.getDate() - (i * 4 + 4));
+            const minDate = new Date();
+            minDate.setDate(minDate.getDate() - (i * 4));
+
+
+
             const posts = await Posts.find({
                 createdAt: {
                     $gte: maxDate,
@@ -76,7 +79,8 @@ export async function GET(){
         console.log('===================================================')
 
         for(let i=0; i<rawPosts.length; i++){
-            for(let j=0; j<rawPosts[i].updateLog.length; j++){
+            const updateLog = rawPosts[i].updateLog || [];
+            for(let j=0; j<updateLog.length; j++){
                 postLogs.push(rawPosts[i].updateLog[j])
             }
         }

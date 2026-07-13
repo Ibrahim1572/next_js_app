@@ -30,8 +30,8 @@ const postsSchema=mongoose.Schema({
         type: Date
     },
     updateLog:{
-        type: Array,
-        default: null
+        type: [Date],
+        default: []
     },
     restoreDate:{
         type: Date
