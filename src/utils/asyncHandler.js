@@ -1,12 +1,24 @@
-const asyncHandler = (fn) => async (req, res, next) => {
-
+import { NextResponse } from 'next/server';
+const asyncHandler = (fn) => async (request, context) => {
+    const startTime = new Date()
+    const method = await request.json()
+    console.log('++++++++++++++++++++++++++++++++++++++++++++')
+    console.log(startTime)
+    console.log(method)
+    console.log(typeof(method))
     try {
-        await fn(req, res, next)
+        // You MUST return the execution of your route handler function
+        return await fn(request, context);
     } catch (error) {
-        res.status(error.code || 500).json({
-            message: error.message,
+        console.error("API Error:", error);
+        
+        // Return a valid NextResponse instead of using Express's res object
+        return NextResponse.json({
+            message: error.message || "Internal Server Error",
             success: false,
-        })
+        }, { 
+            status: error.statusCode || error.code || 500 
+        });
     }
 }
 
