@@ -10,7 +10,6 @@ import validateRequest from '../../validateRequest';
 import {z} from 'zod'
 import asyncHandler from '@/utils/asyncHandler' 
 import ApiError from '@/utils/ApiError'  
-import toastResponse from '@/utils/toastErrorWrapper'
 
 //add post
 export const POST= asyncHandler(async(request: NextRequest)=>{
@@ -38,7 +37,7 @@ export const POST= asyncHandler(async(request: NextRequest)=>{
         
         if (!tokenCookie) {
             cookieType=""
-            toastResponse('Unauthorized user')
+            // toastResponse('Unauthorized user')
             throw new ApiError(401, "Token cookie not found")
         }
                     
@@ -78,7 +77,7 @@ export const GET= asyncHandler(async(request: NextRequest)=>{
         if(!state){
             const allPosts=await Posts.find({isdeleted:false}).sort({updatedAt: -1}).limit(20)
             if(allPosts.length === 0){
-                toastResponse('No Posts to Load')
+                // toastResponse('No Posts to Load')
                 throw new ApiError(200, 'No posts, (DB is empty)')
             }
             return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Posts Retrieved'})

@@ -7,11 +7,16 @@ import validateRequest from '@/app/api/validateRequest'
 import { z } from 'zod'
 import asyncHandler from '@/utils/asyncHandler' 
 import ApiError from '@/utils/ApiError'  
-import toastResponse from '@/utils/toastErrorWrapper'
 
 export const POST = asyncHandler(async(request: NextRequest) => {
     await db_connection();
-        const result= await validateRequest(request.json(), logInSchema) as z.infer<typeof logInSchema>
+    const requestJSON = await request.json()
+    console.log('---------------------------------------------------------')
+        console.log(requestJSON)
+        const result= await validateRequest(requestJSON, logInSchema) as z.infer<typeof logInSchema>
+        
+        console.log('---------------------------------------------------------')
+        console.log(result)
 
         const email = result.email
         const password = result.password
@@ -20,13 +25,15 @@ export const POST = asyncHandler(async(request: NextRequest) => {
         
         if(!dbUser){
             console.log("dbUser is null/wrong email/user not exists")
-            toastResponse('User Not Found')
-            throw new ApiError(409, "Not loggd in, dbUser is null/wrong email/user not exists")
+            return NextResponse.json({toastMessage: "Not loggd in, dbUser is null/wrong email/user not exists", status: 401})
+            // toastResponse('User Not Found')
+            // throw new ApiError(409, "Not loggd in, dbUser is null/wrong email/user not exists")
         }
         if(dbUser.password!==password){
-            console.log("wrong password")
-            toastResponse('Invalid Password')
-            throw new ApiError(401, "Wrong Password")
+            return NextResponse.json({toastMessage: "Wrong Password", status: 401})
+
+            // toastResponse('Invalid Password')
+            // throw new ApiError(401, "Wrong Password")
         }
         // console.log('Login Sucessful')
 

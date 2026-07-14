@@ -8,7 +8,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
 import User from '@/models/userModels'
 import asyncHandler from '@/utils/asyncHandler' 
 import ApiError from '@/utils/ApiError'  
-import toastResponse from '@/utils/toastErrorWrapper'
 
 export const POST = asyncHandler(async(request: NextRequest) => {
     await db_connection();
@@ -32,8 +31,9 @@ export const POST = asyncHandler(async(request: NextRequest) => {
         }
 
         if (!tokenCookie) {
-            toastResponse('Unauthorized user')
-            throw new ApiError(401, "Token cookie not found")
+            return NextResponse.json({toastMessage: "Token cookie not found. UNAUTHORIZED ACCESS", status: 401})
+            // toastResponse('Unauthorized user')
+            // throw new ApiError(401, "Token cookie not found")
         }
 
         
