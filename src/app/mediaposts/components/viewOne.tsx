@@ -4,6 +4,9 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import DataContext from '@/context/DataContext'
 import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+
 
 
 
@@ -17,10 +20,14 @@ export default function ViewOnePost(){
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {postDataOne} = useContext(DataContext) as any
 
+    const [postTitle, setPostTitle] = useState('')
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const searchPost=async(formData: any)=>{
         const searchTitle=formData.get('title').trim()
+        setPostTitle(searchTitle)
         let temp
+
         // console.log(`current view: ${currentView}`)
 
         if(currentView==='restorePost'){
@@ -41,6 +48,21 @@ export default function ViewOnePost(){
         setPostDataOne(temp.data.post)
         
     }
+
+    const queryFunc = async() =>{
+        if(currentView==='restorePost'){
+            temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=true')
+        }
+        else{
+            temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=false')
+        }
+    }
+
+    const {  } = useQuery({
+        queryKey: ['viewOne', postTitle, currentView],
+        queryFn: ()=>{queryFunc(postTitle)}, 
+        enabled: !!postTitle,
+    })
 
     return (
                     <>

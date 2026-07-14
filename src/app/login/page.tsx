@@ -4,8 +4,10 @@ import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn } from 'next-auth/react'
 import {toast} from 'react-hot-toast'
+import { useQuery } from '@tanstack/react-query'
 
 function Page() {
+
     const { data: session, status } = useSession()
     const [toastMsg, setToastMsg]=useState('')
     const router = useRouter()
