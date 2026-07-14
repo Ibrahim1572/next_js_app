@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
+
 const asyncHandler = (fn) => async (request, context) => {
     const startTime = new Date()
-    const method = await request.json()
-    console.log('++++++++++++++++++++++++++++++++++++++++++++')
-    console.log(startTime)
-    console.log(method)
-    console.log(typeof(method))
+    const req = await request
+    
     try {
         // You MUST return the execution of your route handler function
-        return await fn(request, context);
+        const response = await fn(request, context);
+        const endTime = new Date()
+
+        console.log(JSON.stringify({method: req.method, path: req.url, statusCode: response.status, durationMS: endTime-startTime}))
+        return response
     } catch (error) {
         console.error("API Error:", error);
         
