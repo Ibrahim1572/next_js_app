@@ -3,9 +3,11 @@ import {useContext} from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import DataContext from '@/context/DataContext'
+import { useRouter } from 'next/navigation'
 
 export default function RstorePost(){
 
+    const router = useRouter()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {setCurrentView} = useContext(DataContext) as any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,6 +25,7 @@ export default function RstorePost(){
         }
         else{
             toast.error(response.data.toastMessage)
+            router.push('/mediaposts')
         }
     }
 
@@ -33,6 +36,7 @@ export default function RstorePost(){
         console.log(`current view: ${currentView}`)
         if(currentView==='restorePost'){
             temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=true')
+            console.log('7777777777777777777777777777777777')
         }
         else{
             temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=false')
@@ -40,13 +44,17 @@ export default function RstorePost(){
         setPostDataOne(temp.data.post)
         if(temp.data.status===200){
             toast.success(temp.data.toastMessage)
+            
+
         }
         else{
             toast.error(temp.data.toastMessage)
+            console.log('888888888888888888884444444444444444444444448')
+            router.push('/mediaposts')
         }
 
-        setCurrentView("")
-        setPostDataOne(null)
+        // setCurrentView("")
+        // setPostDataOne(null)
         
     }
 

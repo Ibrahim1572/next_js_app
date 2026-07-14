@@ -15,5 +15,5 @@ export const searchPost=z.object({
 })
 
 export const getOnePost=z.object({
-    title: z.string().trim().min(1)
+    title: z.string().trim()
 })

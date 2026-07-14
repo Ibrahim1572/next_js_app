@@ -25,6 +25,7 @@ function Page(){
                 }
                 else{
                     toast.error(response.data.toastMessage)
+                    router.push('/profile')
                 }
         setUserData(response.data)
         console.log(userData)

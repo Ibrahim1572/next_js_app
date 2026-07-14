@@ -33,6 +33,7 @@ function Page() {
         }
         else{
             toast.error(response.data.toastMessage)
+            router.push('/login')
         }
         
         window.location.href = '/mediaposts';

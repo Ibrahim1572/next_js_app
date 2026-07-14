@@ -3,9 +3,11 @@ import {useContext} from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import DataContext from '@/context/DataContext'
+import { useRouter } from 'next/navigation'
 
 export default function DeletePost(){
 
+    const router = useRouter()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {setCurrentView} = useContext(DataContext) as any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,6 +35,7 @@ export default function DeletePost(){
         }
         else{
             toast.error(temp.data.toastMessage)
+            router.push('/mediaposts')
         }
         
     }
@@ -45,6 +48,7 @@ export default function DeletePost(){
             }
             else{
                 toast.error(response.data.toastMessage)
+                router.push('/mediaposts')
             }
 
             setCurrentView("")

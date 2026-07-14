@@ -3,10 +3,12 @@ import {useContext} from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import DataContext from '@/context/DataContext'
+import { useRouter } from 'next/navigation'
 
 
 
 export default function ViewOnePost(){
+    const router= useRouter()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {currentView} = useContext(DataContext) as any
@@ -19,20 +21,24 @@ export default function ViewOnePost(){
     const searchPost=async(formData: any)=>{
         const searchTitle=formData.get('title').trim()
         let temp
-        console.log(`current view: ${currentView}`)
+        // console.log(`current view: ${currentView}`)
+
         if(currentView==='restorePost'){
             temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=true')
         }
         else{
             temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=false')
         }
-        setPostDataOne(temp.data.post)
+
         if(temp.data.status===200){
             toast.success(temp.data.toastMessage)
         }
         else{
             toast.error(temp.data.toastMessage)
+            router.push('/mediaposts')
         }
+
+        setPostDataOne(temp.data.post)
         
     }
 

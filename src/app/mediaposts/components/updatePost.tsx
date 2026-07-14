@@ -3,9 +3,12 @@ import {useContext} from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import DataContext from '@/context/DataContext'
+import { useRouter } from 'next/navigation'
 
 
 export default function UpdatePost(){
+
+    const router = useRouter()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {setCurrentView} = useContext(DataContext) as any
@@ -33,6 +36,7 @@ export default function UpdatePost(){
             }
             else{
                 toast.error(temp.data.toastMessage)
+                router.push('/mediaposts')
             }
             
         }
@@ -55,7 +59,9 @@ export default function UpdatePost(){
         }
         else{
             toast.error(response.data.toastMessage)
+            router.push('/mediaposts')
         }
+
         
         // Reset view or clean up
         setCurrentView("")
