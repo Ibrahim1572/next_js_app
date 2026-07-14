@@ -38,7 +38,8 @@ export const POST= asyncHandler(async(request: NextRequest)=>{
         if (!tokenCookie) {
             cookieType=""
             // toastResponse('Unauthorized user')
-            throw new ApiError(401, "Token cookie not found")
+            // throw new ApiError(401, "Token cookie not found")
+            return NextResponse.json({toastMessage: 'Token cookie not found', status:401})
         }
                     
         
@@ -78,7 +79,8 @@ export const GET= asyncHandler(async(request: NextRequest)=>{
             const allPosts=await Posts.find({isdeleted:false}).sort({updatedAt: -1}).limit(20)
             if(allPosts.length === 0){
                 // toastResponse('No Posts to Load')
-                throw new ApiError(200, 'No posts, (DB is empty)')
+                // throw new ApiError(200, 'No posts, (DB is empty)')
+                return NextResponse.json({toastMessage: 'No posts, DB is Empty', status: 200})
             }
             return NextResponse.json({info: "Posts retrieved", success:true, status:200, posts: allPosts, toastMessage:'Posts Retrieved'})
         }

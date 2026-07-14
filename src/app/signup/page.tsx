@@ -6,20 +6,35 @@ import toast from 'react-hot-toast'
 
 function Page(){
     const router= useRouter()
-    const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
     const[user, setUser]= useState({
         username: "",
         password: "",
         email: ""
     })
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const onSignUp = async (formData:any) =>{
+    const passwordCheck= (formData:any)=>{
+
+        const enteredPassword = formData.get('password').trim()
+        const enteredConfirmPassword = formData.get('confirmPassword').trim()   
+
+        if (enteredPassword !== enteredConfirmPassword) {
+            toast.error("Password and Confirm Password don't match")
+            router.push('/signup')
+        }
+
         const data={
             userName: formData.get('username').trim(),
             email: formData.get('email').trim(),
-            password: formData.get('password').trim()
+            password: enteredPassword
         }
+
+        onSignUp(data)
+    
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onSignUp = async (data:any) =>{
+        
         
         const response = await axios.post("/api/users/signup", data)
         if(response.data.status===200){
@@ -34,8 +49,6 @@ function Page(){
         goToLogin()
     }
 
-    const passwordCheck= password===confirmPassword
-
     function goToLogin(){
         router.push('/login')
     }
@@ -45,16 +58,16 @@ function Page(){
         <div className='flex flex-col items-center justify-center bg-blue-950 min-h-screen p-8 font-[Roboto]'>
             <div className='flex flex-col items-center justify-center bg-blue-300/30 rounded-xl shadow-lg max-w-md w-full min-h-1/2 p-4 gap-1'>
                 <div className='text-[42px] uppercase font-bold'>sign up page</div>
-                <form action={onSignUp} className='p-4 gap-2'>
+                <form action={passwordCheck} className='p-4 gap-2'>
                     <h1 className='p-0.5'>Enter Username:</h1>
                     <input className='border rounded p-0.5' placeholder={'Username'} required type='text' name='username'/>
                     <h1 className='p-0.5'>Enter Email:</h1>
                     <input className='border rounded p-0.5' placeholder={'Email'} required type='email' name='email'/>
                     <h1 className='p-0.5'>Enter Password:</h1>
-                    <input className='border rounded p-0.5' placeholder={'Password'} required  type="password" name='password' value={password}/>
+                    <input className='border rounded p-0.5' placeholder={'Password'} required  type="password" name='password' />
                     <h1 className='p-0.5'>confirm Password:</h1>    
-                    <input className='border rounded p-0.5' placeholder={'Confirm Password'} required  type="password" name='confirmPassword' value={confirmPassword}/>
-                    <button className='flex flex-col justify-center p-0.5 border rounded hover:bg-yellow-300/75' type='submit' disabled={passwordCheck}>Signup</button>
+                    <input className='border rounded p-0.5' placeholder={'Confirm Password'} required  type="password" name='confirmPassword'/>
+                    <button className='flex flex-col justify-center p-0.5 border rounded hover:bg-yellow-300/75' type='submit'>Signup</button>
                     
                 </form>
                 <button className='border p-0.5 hover:bg-yellow-300/75 rounded' onClick={goToLogin} type='submit'>LogIn Instead</button>

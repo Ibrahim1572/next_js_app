@@ -6,7 +6,6 @@ import { logInSchema } from '@/schemas/logInSchema'
 import validateRequest from '@/app/api/validateRequest'
 import { z } from 'zod'
 import asyncHandler from '@/utils/asyncHandler' 
-import ApiError from '@/utils/ApiError'  
 
 export const POST = asyncHandler(async(request: NextRequest) => {
     await db_connection();

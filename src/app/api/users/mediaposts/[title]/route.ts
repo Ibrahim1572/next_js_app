@@ -10,7 +10,6 @@ import { getOnePost } from '@/schemas/mediaPostsSchema'
 import validateRequest from '@/app/api/validateRequest';
 import {z} from 'zod'
 import asyncHandler from '@/utils/asyncHandler' 
-import ApiError from '@/utils/ApiError'  
 
 interface RouteParams {
   params: Promise<{ title: string }>

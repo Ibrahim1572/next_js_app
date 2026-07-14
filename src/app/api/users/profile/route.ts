@@ -7,7 +7,6 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
 import User from '@/models/userModels'
 import asyncHandler from '@/utils/asyncHandler' 
-import ApiError from '@/utils/ApiError'  
 
 export const POST = asyncHandler(async(request: NextRequest) => {
     await db_connection();
