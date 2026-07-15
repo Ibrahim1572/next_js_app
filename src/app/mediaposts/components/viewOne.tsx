@@ -25,11 +25,8 @@ export default function ViewOnePost(){
 
     const queryFunc = async(postTitle: string) =>{
         
-        if(currentView ==='viewOne'){
-            const res=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=false')
-            console.log(res)
-            return res
-        }
+        const res=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=false')
+        return res
     }
 
     const { data } = useQuery({
