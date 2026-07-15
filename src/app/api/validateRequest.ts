@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server"
 import { z } from 'zod'
 import ApiError from "@/utils/ApiError";
 
@@ -9,8 +8,8 @@ export default async function validateRequest<T>(
   const result = schema.safeParse(data);
 
   if (!result.success) {
-    throw new ApiError(400, "Validation failed", result.error.issues);   // ← throw, don't return
+    throw new ApiError(400, "Validation failed", result.error.issues);   
   }
 
-  return result.data;   // ← always returns the validated value, never a Response
+  return result.data;   
 }

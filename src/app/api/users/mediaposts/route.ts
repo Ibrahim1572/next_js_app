@@ -9,14 +9,16 @@ import { addPost } from '@/schemas/mediaPostsSchema'
 import validateRequest from '../../validateRequest';
 import {z} from 'zod'
 import asyncHandler from '@/utils/asyncHandler' 
-import ApiError from '@/utils/ApiError'  
 
 //add post
 export const POST= asyncHandler(async(request: NextRequest)=>{
     await db_connection();
     
-
-        const result= await validateRequest(request, addPost) as z.infer<typeof addPost>
+        // console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+        // console.log(request)
+        // console.log(await request.json())
+        const req = await request.json()
+        const result= await validateRequest(req, addPost) as z.infer<typeof addPost>
         
         const title= result.title
         const body= result.body
