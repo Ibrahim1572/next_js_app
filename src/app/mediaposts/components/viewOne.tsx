@@ -1,11 +1,10 @@
 'use client'
-import {useContext} from 'react'
+import {useContext, useEffect, useState, useEffectEvent} from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import DataContext from '@/context/DataContext'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
 
 
 
@@ -15,54 +14,47 @@ export default function ViewOnePost(){
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {currentView} = useContext(DataContext) as any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const {setPostDataOne} = useContext(DataContext) as any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const {postDataOne} = useContext(DataContext) as any
-
+    
     const [postTitle, setPostTitle] = useState('')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const searchPost=async(formData: any)=>{
         const searchTitle=formData.get('title').trim()
         setPostTitle(searchTitle)
-        let temp
+    }
 
-        // console.log(`current view: ${currentView}`)
-
-        if(currentView==='restorePost'){
-            temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=true')
-        }
-        else{
-            temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(searchTitle)+'?deleted=false')
-        }
-
-        if(temp.data.status===200){
-            toast.success(temp.data.toastMessage)
-        }
-        else{
-            toast.error(temp.data.toastMessage)
-            router.push('/mediaposts')
-        }
-
-        setPostDataOne(temp.data.post)
+    const queryFunc = async(postTitle: string) =>{
         
-    }
-
-    const queryFunc = async() =>{
-        if(currentView==='restorePost'){
-            temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=true')
-        }
-        else{
-            temp=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=false')
+        if(currentView ==='viewOne'){
+            const res=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=false')
+            console.log(res)
+            return res
         }
     }
 
-    const {  } = useQuery({
+    const { data } = useQuery({
         queryKey: ['viewOne', postTitle, currentView],
-        queryFn: ()=>{queryFunc(postTitle)}, 
+        queryFn: ()=> queryFunc(postTitle), 
         enabled: !!postTitle,
     })
+
+    const navigateToMedia = useEffectEvent(()=>{
+        router.push('/mediaposts')
+    })
+
+    useEffect(() => {
+        if(data){
+            if(data?.data.status===200){
+                toast.success(data.data.toastMessage)
+            }
+            else{
+                toast.error(data?.data.toastMessage)
+                navigateToMedia()
+            }
+        }
+    }, [data])
+
+    
 
     return (
                     <>
@@ -92,15 +84,15 @@ export default function ViewOnePost(){
                                     
                     </header>
                     <div className='flex justify-center items-center w-full p-4'>
-                        {postDataOne ? (
-                            <div key={postDataOne._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
-                                <h3 className="text-2xl font-bold mb-3 text-white">{postDataOne?.postTitle}</h3>
-                                <p className="text-base text-slate-300 font-normal">{postDataOne?.postBody}</p>
+                        {data ? (
+                            <div key={data.data.post._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
+                                <h3 className="text-2xl font-bold mb-3 text-white">{data.data.post?.postTitle}</h3>
+                                <p className="text-base text-slate-300 font-normal">{data.data.post?.postBody}</p>
                                 
                                 {/* Optional: Add metadata fields if you want to show them */}
                                 <div className="mt-4 pt-3 border-t border-blue-700/30 text-xs text-slate-400 font-normal flex justify-between">
-                                    <span>Likes: {postDataOne.postLikes}</span>
-                                    <span>Created: {new Date(postDataOne.createdAt).toLocaleDateString()}</span>
+                                    <span>Likes: {data.data.post.postLikes}</span>
+                                    <span>Created: {new Date(data.data.post.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
                         ) : (
