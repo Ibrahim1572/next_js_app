@@ -8,11 +8,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function DeletePost(){
 
-    const queryClient = useQueryClient();
+    const queryClient = useQueryClient()
     
     const router = useRouter()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {currentView} = useContext(DataContext) as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const {setCurrentView} = useContext(DataContext) as any
     
     const [postTitle, setPostTitle] = useState('')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,16 +29,17 @@ export default function DeletePost(){
     
     const deletePostFunc = async(postTitle: string) =>{
         const resp = await axios.post('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=false')
-        if(resp?.data.status===200){
-            toast.success(resp.data.toastMessage)
-            // router.push('/mediaposts')
-        }
-        else{
-            toast.error(resp?.data.toastMessage)
-            router.push('/mediaposts')
-        }
         return resp
     }
+
+    // if(resp?.data.status===200){
+    //         toast.success(resp.data.toastMessage)
+    //         // router.push('/mediaposts')
+    //     }
+    //     else{
+    //         toast.error(resp?.data.toastMessage)
+    //         router.push('/mediaposts')
+    //     }
 
     const searchQueryFunc = async(postTitle: string) =>{      
         const res=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=false')
@@ -51,7 +54,31 @@ export default function DeletePost(){
     })
 
     const deleteMutation = useMutation({
-        mutationFn: ()=>deletePostFunc(postTitle)
+        mutationFn: async()=>{
+            await queryClient.cancelQueries({ queryKey: deleteQueryKey })
+            const previousData = queryClient.getQueryData(deleteQueryKey)
+            queryClient.setQueryData(deleteQueryKey, undefined)
+            deletePostFunc(postTitle)
+            toast.success('Post deleted successfully')
+            return { previousData }
+        }, 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onError: (error: any, variables, context:{ previousData: unknown } | undefined) => {
+            if (context?.previousData) {
+                queryClient.setQueryData(deleteQueryKey, context?.previousData)
+            }
+
+            const message = error?.response?.data?.message || 'Failed to delete post'
+            toast.error(message)
+        },
+        onSettled: (data, error) => {
+            if (!error) {
+                setCurrentView('addPost')
+                router.push('/mediaposts')
+            }
+            queryClient.invalidateQueries({ queryKey: deleteQueryKey })
+        },
+
     })
 
     useEffect(() => {
@@ -93,7 +120,7 @@ export default function DeletePost(){
                     </header>
                     <div className='flex justify-center items-center w-full p-4'>
                         {data ? (
-                            <form action={deleteMutation.mutateAsync}>
+                            <form action={() => deleteMutation.mutate()}>
                             <div key={data?.data._id} className='p-6 min-w-[300px] max-w-md outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
                                 <h1>Post</h1>
                                 <h3 className="text-2xl font-bold mb-3 text-white">{data?.data.post.postTitle}</h3>
@@ -108,6 +135,7 @@ export default function DeletePost(){
                             <button
                                 type="submit"
                                 className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                                disabled={deleteMutation.isPending}
                             >
                                 Delete Permanently
                             </button>
