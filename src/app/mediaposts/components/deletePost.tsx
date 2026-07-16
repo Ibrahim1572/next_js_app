@@ -8,19 +8,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function DeletePost(){
 
-    const queryClient = useQueryClient()
-
+    const queryClient = useQueryClient();
+    
     const router = useRouter()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {currentView} = useContext(DataContext) as any
-       
+    
     const [postTitle, setPostTitle] = useState('')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const searchPostFunc=async(formData: any)=>{
         const searchTitle=formData.get('title').trim()
         setPostTitle(searchTitle)
     }
-
+    
     const navigateToMedia = useEffectEvent(()=>{
         router.push('/mediaposts')
     })
@@ -42,9 +42,10 @@ export default function DeletePost(){
         const res=await axios.get('/api/users/mediaposts/'+encodeURIComponent(postTitle)+'?deleted=false')
         return res
     }
-
+    
+    const deleteQueryKey = ['deletePost', postTitle, currentView]
     const { data } = useQuery({
-        queryKey: ['deletePost', postTitle, currentView],
+        queryKey: deleteQueryKey,
         queryFn: ()=> searchQueryFunc(postTitle), 
         enabled: !!postTitle,
     })
