@@ -1,19 +1,62 @@
 'use client'
-import {useContext} from 'react'
+import {useContext, useEffect, useEffectEvent} from 'react'
 import DataContext from '@/context/DataContext'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import { useQuery } from '@tanstack/react-query'
 
 
 export default function ViewAllPosts(){
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {postData} = useContext(DataContext) as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const {setPostData} = useContext(DataContext) as any
+    
+
+
+    // const viewAll=async(isDeleted:string)=>{
+    //         setPostData([])
+    //         const temp=await axios.get('/api/users/mediaposts?deleted='+isDeleted)
+    //         setPostData(temp.data.posts)
+    //         if(temp.data.status===200){
+    //             toast.success(temp.data.toastMessage)
+    //         }
+    //         else{
+    //             toast.error(temp.data.toastMessage)
+    //         }
+    //     }
+
+    const {data} = useQuery({
+        queryKey: ['viewAll'],
+        queryFn: ()=>viewAllQueryFunc('false'),
+        enabled: true
+    })
+
+    const viewAllQueryFunc = async(isDeleted: string) =>{
+        const temp = await axios.get('/api/users/mediaposts?deleted='+isDeleted)
+        // console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+        // console.log(temp)
+        return temp
+    }
+
+    useEffect(()=>{
+        if(data){
+            if(data.data.status===200){
+                toast.success(data.data.toastMessage)
+            }
+            else{
+                toast.error(data.data.toastMessage)
+            }
+        }
+    } ,[data])
 
     return(
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 justify-center items-center w-full p-4'>
-                        
-                        {postData && postData.length > 0 ? (
+                        {/* {console.log(data)} */}
+                        {data?.data.posts && data?.data.posts.length > 0 ? (
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            postData.map(function(item: any) {
+                            data.data.posts.map(function(item: any) {
                                 return (
                                     <div key={item._id} className='p-4 outline-2 rounded-xl text-center bg-blue-800/30 border border-blue-700/50'>
                                         <h3 className="text-xl font-bold mb-2">{item.postTitle}</h3>

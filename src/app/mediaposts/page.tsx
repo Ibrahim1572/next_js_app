@@ -139,7 +139,7 @@ function Page(){
                 <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('dashboard'); getGraphData()}}>Analytic Dashboard</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('addPost'); }}>Add Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewOne'); }}>View One Post</div>
-                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); viewAll('false') }}>View All Posts</div>
+                <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('viewAll'); }}>View All Posts</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('updatePost');}}>Update Post</div>
                 <div className='size-8 grow p-1 outline-2 rounded-xl  mx-2 my-2 text-center bg-blue-800/30 hover:bg-blue-800/75' onClick={function(){setCurrentView('deletePost');}}>Delete Post</div>
                 {isAdmin?(
