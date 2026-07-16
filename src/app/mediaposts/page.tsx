@@ -65,12 +65,12 @@ function Page(){
     const [isAdmin, setIsAdmin]= useState(false)
     async function getAdminCheckData() {
         try {
-            const userType = (await axios.post('/api/users/profile')).data?.['User Data']?.userType ?? "Standard User"
+            const userType = (await axios.post('/api/users/profile')).data?.['User Data']?.userType
             
-            console.log(`response: ${userType}`)
+            // console.log(`response: ${userType}`)
             
             
-            if (userType === 'Admin') {
+            if (userType === 'admin') {
                 setIsAdmin(true)
             } else {
                 setIsAdmin(false)

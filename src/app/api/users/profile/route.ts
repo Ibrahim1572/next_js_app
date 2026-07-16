@@ -59,9 +59,8 @@ export const POST = asyncHandler(async(request: NextRequest) => {
                         }
 
         const user=await User.findOne({email: extractedUserEmail})
-        const adminStatus = user.isAdmin
-        const extractedUserType = adminStatus?"Admin":"Standard User"
-        console.log(extractedUserType)
+        const extractedUserType = user.userRole
+        // console.log(extractedUserType)
         
         const userData={email:extractedUserEmail, name:extractedUserName, userType: extractedUserType}
         const response =NextResponse.json({'User Data': userData, status:200, toastMessage:'Data Retrieved Successfully'})
