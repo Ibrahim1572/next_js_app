@@ -8,9 +8,9 @@ export async function PATCH() {
         await db_connection();
 
         // Target all documents where the field exists, and remove just that field
-        const result = await Posts.updateMany(
-            { update: { $exists: true } }, // Filter: Find posts that have this field
-            { $unset: { updateCount: "" } },
+        const result = await Users.updateMany(
+            {}, // Filter: Find posts that have this field
+            { $set: { userRole: "standard" } },
             { strict: false}    // Action: Completely delete the field from those documents
         );
 
