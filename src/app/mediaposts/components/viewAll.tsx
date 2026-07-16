@@ -1,33 +1,10 @@
 'use client'
-import {useContext, useEffect, useEffectEvent} from 'react'
-import DataContext from '@/context/DataContext'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { useQuery } from '@tanstack/react-query'
 
 
 export default function ViewAllPosts(){
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const {postData} = useContext(DataContext) as any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const {setPostData} = useContext(DataContext) as any
-
-    
-    
-
-
-    // const viewAll=async(isDeleted:string)=>{
-    //         setPostData([])
-    //         const temp=await axios.get('/api/users/mediaposts?deleted='+isDeleted)
-    //         setPostData(temp.data.posts)
-    //         if(temp.data.status===200){
-    //             toast.success(temp.data.toastMessage)
-    //         }
-    //         else{
-    //             toast.error(temp.data.toastMessage)
-    //         }
-    //     }
 
     const {data, refetch} = useQuery({
         queryKey: ['viewAll'],
@@ -40,8 +17,6 @@ export default function ViewAllPosts(){
 
     const viewAllQueryFunc = async(isDeleted: string) =>{
         const temp = await axios.get('/api/users/mediaposts?deleted='+isDeleted)
-        // console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-        // console.log(temp)
         return temp
     }
 
