@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { string } from "zod";
 
 const userSchema=mongoose.Schema({
     userName: {
@@ -19,9 +20,9 @@ const userSchema=mongoose.Schema({
         type: Boolean,
         default: false
     },
-    isAdmin:{
-        type: Boolean,
-        default:false
+    userRole:{
+        type: string,
+        default: 'standard'
     },
 
     forgotPasswordToken:String,
