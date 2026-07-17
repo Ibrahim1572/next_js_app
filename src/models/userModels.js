@@ -20,7 +20,7 @@ const userSchema=mongoose.Schema({
         default: false
     },
     userRole:{
-        type: string,
+        type: String,
         default: 'standard'
     },
 
