@@ -8,7 +8,7 @@ interface UserProfile {
     'User Data': {
         name: string;
         email: string;
-        userType: boolean;
+        role: string;
     };
     status: number;
     toastMessage: string;
@@ -27,8 +27,9 @@ function Page(){
                     toast.error(response.data.toastMessage)
                     router.push('/profile')
                 }
-        setUserData(response.data)
-        console.log(userData)
+        setUserData(response.data['User Data'].userData)
+        console.log(response.data['User Data'].userData)
+        console.log(userData?.['User Data'].email)
         return response
     }
 
@@ -49,12 +50,11 @@ function Page(){
         <div className="p-8 flex flex-col gap-4 bg-slate-900 min-h-screen text-white">
             <div>Profile Page</div>
             
-            {/* Displaying the data if it exists */}
             {userData? (
                 <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                    <p><strong>Name:</strong> {userData['User Data'].name}</p>
-                    <p><strong>Email:</strong> {userData['User Data'].email}</p>
-                    <p><strong>User Type:</strong> {userData['User Data'].userType}</p>
+                    <p><strong>Name:</strong> {userData?.['User Data'].name}</p>
+                    <p><strong>Email:</strong> {userData?.['User Data'].email}</p>
+                    <p><strong>User Type:</strong> {userData?.['User Data'].role}</p>
                 </div>
             ):(<div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
                     <p><strong></strong></p>

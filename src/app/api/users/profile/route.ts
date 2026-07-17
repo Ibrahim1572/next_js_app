@@ -7,7 +7,11 @@ import cookieFunction from '@/utils/cookieWrapper'
 
 export const POST = asyncHandler(async(request: NextRequest) => {
     await db_connection();
-    const userData= await cookieFunction()
+    const resp= await cookieFunction()
+    const userData = await resp.json()
+    // console.log(await userData.json())
+    // console.log(typeof(userData))
+
 
     const response =NextResponse.json({'User Data': userData, status:200, toastMessage:'Data Retrieved Successfully'})
     return response        
