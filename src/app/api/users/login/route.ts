@@ -11,19 +11,20 @@ export const POST = asyncHandler(async(request: NextRequest) => {
     await db_connection();
     const requestJSON = await request.json()
     console.log('---------------------------------------------------------')
-        console.log(requestJSON)
+        // console.log(requestJSON)
         const result= await validateRequest(requestJSON, logInSchema) as z.infer<typeof logInSchema>
         
-        console.log('---------------------------------------------------------')
-        console.log(result)
-
+        // console.log(result)
+        
         const email = result.email
         const password = result.password
-
+        
         const dbUser= await User.findOne({email})
+        // console.log('---------------------------------------------------------')
+        // console.log(dbUser)
         
         if(!dbUser){
-            console.log("dbUser is null/wrong email/user not exists")
+            // console.log("dbUser is null/wrong email/user not exists")
             return NextResponse.json({toastMessage: "Not loggd in, dbUser is null/wrong email/user not exists", status: 401})
             // toastResponse('User Not Found')
             // throw new ApiError(409, "Not loggd in, dbUser is null/wrong email/user not exists")
@@ -38,8 +39,11 @@ export const POST = asyncHandler(async(request: NextRequest) => {
 
         const tokenData={
             name: dbUser.userName,
-            email: dbUser.email
+            email: dbUser.email,
+            role: dbUser.userRole
         }
+
+        
 
         const tk_secret=process.env.SECRET_TOKEN || "Ibrahim";
         const token= jwt.sign(tokenData, tk_secret, {expiresIn: '1d'})

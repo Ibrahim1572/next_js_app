@@ -16,10 +16,12 @@ const cookieFunction = async() => {
             if(!tokenCookie){
                 tokenCookie=cookieStore.get('__Secure-next-auth.session-token')
                 cookieType="nextAuth"
+                // console.log('next auth 1')
             }
             if(!tokenCookie){
                 tokenCookie=cookieStore.get('next-auth.session-token')
                 cookieType="nextAuth"
+                // console.log('next auth 1')
             }
             
             if (!tokenCookie) {
@@ -37,6 +39,7 @@ const cookieFunction = async() => {
                 extractedUserEmail = decodedToken.email;
                 extractedUserName = decodedToken.name;
                 extractedUserRole = decodedToken.role;
+                // console.log('next auth 2')
             }
     
             if(cookieType==='nextAuth'){
@@ -48,9 +51,15 @@ const cookieFunction = async() => {
                     extractedUserName = session.user.name;
                     extractedUserRole = "standard";
                     }
+                // console.log('next auth 2')
             }
 
+    // console.log(extractedUserEmail)
+    // console.log(extractedUserName)
+    // console.log(extractedUserRole)
+
     const userData = {email: extractedUserEmail, name: extractedUserName, role: extractedUserRole}
+    // console.log(userData)
     return NextResponse.json({userData: userData, status: 200})
 }
 
