@@ -14,7 +14,7 @@ const cookieFunction = async() => {
             let extractedUserRole= " "
     
             if(!tokenCookie){
-                tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
+                tokenCookie=cookieStore.get('__Secure-next-auth.session-token')
                 cookieType="nextAuth"
             }
             if(!tokenCookie){
