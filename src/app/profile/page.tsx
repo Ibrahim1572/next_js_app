@@ -1,7 +1,7 @@
 'use client'
 import axios from 'axios'
 import {useRouter} from 'next/navigation'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import toast from 'react-hot-toast'
 
 interface UserProfile {
@@ -29,9 +29,16 @@ function Page(){
                 }
         setUserData(response.data['User Data'].userData)
         console.log(response.data['User Data'].userData)
-        console.log(userData?.['User Data'].email)
+        // console.log(userData?.['User Data'].email)
         return response
     }
+    // useEffect(function(){
+    //     getData()
+    // }) 
+    useEffect(function(){
+        console.log(`user data: ${userData}`)
+
+    }, [userData])
 
     const goToSignOut= async()=>{
         router.push("/logout")
@@ -52,9 +59,9 @@ function Page(){
             
             {userData? (
                 <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                    <p><strong>Name:</strong> {userData?.['User Data'].name}</p>
-                    <p><strong>Email:</strong> {userData?.['User Data'].email}</p>
-                    <p><strong>User Type:</strong> {userData?.['User Data'].role}</p>
+                    <p><strong>Name:</strong> {userData.name }</p>
+                    <p><strong>Email:</strong> {userData.email}</p>
+                    <p><strong>User Type:</strong> {userData.role}</p>
                 </div>
             ):(<div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
                     <p><strong></strong></p>
