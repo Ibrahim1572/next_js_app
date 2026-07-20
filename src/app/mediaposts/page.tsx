@@ -13,6 +13,7 @@ import UpdatePost from './components/updatePost'
 import ViewAllPosts from './components/viewAll'
 import ViewOnePost from './components/viewOne'  
 import ViewArchivedPosts from './components/viewArchivedPosts'
+import cookieFunction from '@/utils/cookieWrapper';
 
 
 
@@ -45,8 +46,14 @@ function Page(){
         }
     }}
 
+    const customJwtFunc = async() =>{
+        const response = await axios.get('api/users/customJwtToken')
+        console.log(`response from page.tsx: ${response}`)
+    }
     useEffect(function() {
             getGraphData();
+            // customJwtFunc()
+            
         },[]);
 
     const viewAll=async(isDeleted:string)=>{
@@ -65,10 +72,9 @@ function Page(){
     const [isAdmin, setIsAdmin]= useState(false)
     async function getAdminCheckData() {
         try {
-            const userType = (await axios.post('/api/users/profile')).data?.['User Data']?.userType
-            
-            // console.log(`response: ${userType}`)
-            
+            const resp = await axios.post('/api/users/profile')
+            console.log(`response in mediaposts/page.tsx:${resp.data['User Data'].userData.name}`)
+            const userType = resp.data['User Data'].userData.role
             
             if (userType === 'admin') {
                 setIsAdmin(true)
@@ -81,8 +87,9 @@ function Page(){
         }
     }
     useEffect(function() {
-        getAdminCheckData()
+        getAdminCheckData();
     }, [])
+
     
     
     const router=useRouter()

@@ -10,7 +10,7 @@ import asyncHandler from '@/utils/asyncHandler'
 export const POST = asyncHandler(async(request: NextRequest) => {
     await db_connection();
     const requestJSON = await request.json()
-    console.log('---------------------------------------------------------')
+    // console.log('---------------------------------------------------------')
         // console.log(requestJSON)
         const result= await validateRequest(requestJSON, logInSchema) as z.infer<typeof logInSchema>
         
