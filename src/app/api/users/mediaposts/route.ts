@@ -19,13 +19,15 @@ export const POST= asyncHandler(async(request: NextRequest)=>{
         const title= result.title
         const body= result.body
 
-        const userData = await cookieFunction()
-        console.log(`cookie Func response: ${userData}`)
+        const resp = await cookieFunction()
+        const userData = await resp.json()
+        
+        // console.log(`cookie Func response: ${userData.userData.name}`)
     
         const dateNow= new Date()
-        const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": userData, 'deletedDate':dateNow})
+        const newPost=new Posts({"postTitle":title, "postBody": body, "postedBy": userData.userData.name, 'deletedDate':dateNow})
         const savedPost=await newPost.save()
-        
+        // const savedPost=""
         return NextResponse.json({post: savedPost, success:true, message:"Post added", status:200, toastMessage:'Post added Successfully'})
 
     })
