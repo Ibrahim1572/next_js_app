@@ -10,6 +10,7 @@ import { getOnePost } from '@/schemas/mediaPostsSchema'
 import validateRequest from '@/app/api/validateRequest';
 import {z} from 'zod'
 import asyncHandler from '@/utils/asyncHandler' 
+import cookieFunction from '@/utils/cookieWrapper';
 
 interface RouteParams {
   params: Promise<{ title: string }>
@@ -52,42 +53,6 @@ export const POST = asyncHandler(async(request :NextRequest, context: RouteParam
     isDeleted==='true'?state=true:state=false
 
         if (state===false) {
-            const cookieStore=cookies();
-            let extractedUserEmail=""
-            let cookieType='jwt'
-            let tokenCookie=(await cookieStore).get('token');
-            
-            if(!tokenCookie){
-                tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
-                cookieType='nextAuth'
-            }
-            if(!tokenCookie){
-                tokenCookie=(await cookieStore).get('next-auth.session-token')
-                cookieType='nextAuth'
-            }
-                    
-            if (!tokenCookie) {
-                // toastResponse('No user logged In: UNAUTHORIZED ACCESS')
-                // throw new ApiError(401, "Token cookie not found, user is not logged in")
-                return NextResponse.json({toastMessage: "Token cookie not found , USER not logged in", status: 401})
-            }
-
-            if(cookieType==='jwt'){
-                        const tokenValue = tokenCookie.value;
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const decodedToken= jwtDecode(tokenValue) as any;
-                        extractedUserEmail = decodedToken.email;
-                    }
-            
-                    if(cookieType==='nextAuth'){
-                        const session = await getServerSession(authOptions);
-            
-                        if (session && session.user && session.user.email) {
-                            extractedUserEmail = session.user.email;
-                            }
-                    }
-
-
             // get title
             const {title}=await context.params
             const getTitle= decodeURIComponent(title)
@@ -103,8 +68,11 @@ export const POST = asyncHandler(async(request :NextRequest, context: RouteParam
 
             const dbId=await dbPost.postedBy
 
+            const resp = await cookieFunction()
+            const userData = await resp.json()
+
             //check db post and logged in user is same
-            if(extractedUserEmail!==dbId){
+            if(userData.userData.email!==dbId){
                 // toastResponse("INVALID ACTION: You can not delete soemone else's post")
                 // throw new ApiError(401, "You can not delete soemone else's post")
                 return NextResponse.json({toastMessage: "You can not delete someone else's post", status: 401})
@@ -146,42 +114,9 @@ export const POST = asyncHandler(async(request :NextRequest, context: RouteParam
 //update post api
 export const PATCH = asyncHandler(async(request :NextRequest, context: RouteParams)=>{
     await db_connection();
-
         //get user details
-        const cookieStore=cookies();
-        let extractedUserEmail=''
-        let tokenCookie=(await cookieStore).get('token')
-        let cookieType='jwt'
-
-        if(!tokenCookie){
-            tokenCookie=(await cookieStore).get('__Secure-next-auth.session-token')
-            cookieType='nextAuth'
-        }
-        if(!tokenCookie){
-            tokenCookie=(await cookieStore).get('next-auth.session-token')
-            cookieType='nextAuth'
-        }
-                
-        if (!tokenCookie) {
-            // toastResponse('No user logged In: UNAUTHORIZED ACCESS')
-            // throw new ApiError(401, "Token cookie not found, user is not logged in")
-            return NextResponse.json({toastMessage: "Tokken cookie not found, User is not logged in", status: 401})
-        }
-
-        if(cookieType==='jwt'){
-                    const tokenValue = tokenCookie.value;
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const decodedToken= jwtDecode(tokenValue)as any;
-                    extractedUserEmail = decodedToken.email;
-                }
-        
-                if(cookieType==='nextAuth'){
-                    const session = await getServerSession(authOptions);
-                    
-                    if (session && session.user && session.user.email) {
-                        extractedUserEmail = session.user.email;
-                        }
-                }
+        const resp = await cookieFunction()
+        const userData = await resp.json()
 
         // get title
         const {title}=await context.params
@@ -200,8 +135,9 @@ export const PATCH = asyncHandler(async(request :NextRequest, context: RoutePara
 
         const dbId=dbPost.postedBy
 
+
         //check db post and logged in user is same
-        if(extractedUserEmail!==dbId){
+        if(userData.userData.email!==dbId){
             // toastResponse("INVALID ACTION: You can not delete soemone else's post")
             return NextResponse.json({toastMessage: "INVALID ACTION: You can not Update someone else's post", status: 401})
             // throw new ApiError(401, "You can not delete soemone else's post")
