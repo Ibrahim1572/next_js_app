@@ -6,6 +6,7 @@ import { logInSchema } from '@/schemas/logInSchema'
 import validateRequest from '@/app/api/validateRequest'
 import { z } from 'zod'
 import asyncHandler from '@/utils/asyncHandler' 
+import RefreshToken from '@/models/refreshTokenModel'
 
 export const POST = asyncHandler(async(request: NextRequest) => {
     await db_connection();
@@ -37,19 +38,32 @@ export const POST = asyncHandler(async(request: NextRequest) => {
         }
         // console.log('Login Sucessful')
 
-        const tokenData={
+        const accessTokenData={
             name: dbUser.userName,
             email: dbUser.email,
             role: dbUser.userRole
         }
 
-        
+        const refreshTokenData={
+            email: dbUser.email
+        }
 
-        const tk_secret=process.env.SECRET_TOKEN || "Ibrahim";
-        const token= jwt.sign(tokenData, tk_secret, {expiresIn: '1d'})
+        const access_tk_secret=process.env.SECRET_ACCESS_TOKEN || "Ibrahim";
+        const accessToken= jwt.sign(accessTokenData, access_tk_secret, {expiresIn: '15m'})
+
+        const refresh_tk_secret=process.env.SECRET_REFRESH_TOKEN || "Ibrahim1";
+        const refreshToken= jwt.sign(refreshTokenData, refresh_tk_secret, {expiresIn: '7d'})
+
+        const dateNow = new Date()
+        const expiryDate = new Date(Date.now()+7*60*60*24*1000)
+
+        const newRefreshToken = new RefreshToken({userEmail: dbUser.email, createdAt: dateNow, updatedAt: dateNow, expiresAt: expiryDate, isValid: true, token: refreshToken})
+        const savedRefreshToken = await newRefreshToken.save()
+        console.log(`savedRefreshToken: ${savedRefreshToken}`)
 
         const response= NextResponse.json({message: 'user loggedIN sucessfully: ', success: true, status:200, User:dbUser, toastMessage: 'Login Successfull'})
-        response.cookies.set('token', token, {httpOnly:true})
+        response.cookies.set('accessToken', accessToken, {httpOnly:true, maxAge:15*60, sameSite: 'strict'})
+        response.cookies.set('refreshToken', refreshToken, {httpOnly:true, maxAge: 7*60*60*24, sameSite: 'strict', path: '/api/auth/refresh'})
 
         return response
 
