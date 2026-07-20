@@ -48,11 +48,11 @@ function Page(){
 
     const customJwtFunc = async() =>{
         const response = await axios.get('api/users/customJwtToken')
-        console.log(`response from page.tsx: ${response}`)
+        console.log(`response from page.tsx for jwt route: ${response}`)
     }
     useEffect(function() {
             getGraphData();
-            // customJwtFunc()
+            customJwtFunc()
             
         },[]);
 
