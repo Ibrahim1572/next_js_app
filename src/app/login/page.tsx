@@ -4,17 +4,21 @@ import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn } from 'next-auth/react'
 import {toast} from 'react-hot-toast'
-import { useQuery } from '@tanstack/react-query'
+
 
 function Page() {
 
     const { data: session, status } = useSession()
-    const [toastMsg, setToastMsg]=useState('')
     const router = useRouter()
     const [user, setUser] = useState({
         password: "",
         email: ""
     })
+
+    const assignCustomJwtToken = async() =>{
+        const response = await axios.get('api/users/customJwtToken')
+        console.log(`response from page.tsx: ${response}`)
+    }
 
     useEffect(function() {
         if (session) {
@@ -111,7 +115,7 @@ function Page() {
                 <div className="mt-1">
                     <button 
                         type="button"
-                        onClick={function() { signIn('github') }}
+                        onClick={function() { signIn('github');}}
                         className="w-full py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white font-semibold rounded-lg shadow-md transition duration-200 flex items-center justify-center gap-2"
                     >
                         Sign In with GitHub
@@ -120,7 +124,7 @@ function Page() {
                 <div className="mt-1">
                     <button 
                         type="button"
-                        onClick={function() { signIn('google') }}
+                        onClick={function() { signIn('google'); }}
                         className="w-full py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white font-semibold rounded-lg shadow-md transition duration-200 flex items-center justify-center gap-2"
                     >
                         Sign In with Google
