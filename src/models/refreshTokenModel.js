@@ -1,27 +1,39 @@
 import mongoose from 'mongoose'
 
 const refreshTokenSchema = mongoose.Schema({
-    userId:{
+    userEmail:{
         required: true,
-        type: stirng
+        type: Stirng
     },
+
     isValid:{
         requred: true,
         default: true,
-        type: Boolean,
-
+        type: Boolean
     },
+
+    token:{
+        required: true,
+        type: String
+    },
+
     createdAt:{
         required: true,
         type: Date
     },
+
     updatedAt:{
         required: true,
+        type: Date
+    }, 
+    
+    expiresAt:{
+        requred: true,
         type: Date
     }
 
 })
 
-const RefreshTokenSchema= mongoose.models.refreshTokenSchema || mongoose.model("refreshTokens", refreshTokenSchema)
+const RefreshToken = mongoose.models.refreshTokenSchema || mongoose.model("refreshTokens", refreshTokenSchema)
 
-export default RefreshTokenSchema
+export default RefreshToken
