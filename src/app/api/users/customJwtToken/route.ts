@@ -3,9 +3,10 @@ import jwt from 'jsonwebtoken'
 import { NextResponse } from 'next/server'
 import {cookies} from 'next/headers'
 import RefreshToken from '@/models/refreshTokenModel'
+import asyncHandler from '@/utils/asyncHandler'
 
 
-export const GET = async() =>{
+export const GET = asyncHandler(async() =>{
 
     const tempFunc = async() =>{
         const resp = await cookieFunction()
@@ -57,4 +58,4 @@ export const GET = async() =>{
     }
     
     return NextResponse.json({response: resp, status: 200})
-}
+})

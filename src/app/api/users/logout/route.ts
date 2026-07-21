@@ -1,9 +1,17 @@
 
 import { NextResponse, NextRequest } from 'next/server'
+import cookieFunction from '@/utils/cookieWrapper'
+import asyncHandler from '@/utils/asyncHandler'
+import RefreshToken from '@/models/refreshTokenModel'
 
-export const POST= ((request :NextRequest)=>{
+export const POST= asyncHandler(async(request :NextRequest)=>{
     
-        const response=NextResponse.json({message: 'Logged Out Successfully', success:true, status:200, toastMessage: 'Logged Out Successfully'})
+        const resp = await cookieFunction()
+        const userData = await resp.json()  
+       
+        await RefreshToken.findOneAndUpdate({userEmail: userData.userData.email, isValid: true}, {$set:{isValid: false}}, {sort:{createdAt:-1}})
+
+        const response=NextResponse.json({message: 'Logged Out Successfully', userData: userData.userData.name, success:true, status:200, toastMessage: 'Logged Out Successfully'})
         response.cookies.set('token', "", { 
             httpOnly: true, 
             expires: new Date(0),
@@ -22,8 +30,6 @@ export const POST= ((request :NextRequest)=>{
             path: '/' 
         })
 
-        // await RefreshToken.updateMany({userEmail: tokenData.userData.email, isValid: true}, {$set:{isVaid: false}})
-        
         response.cookies.set('next-auth.session-token', "", { 
             httpOnly: true,
             expires: new Date(0),
