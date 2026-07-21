@@ -6,7 +6,7 @@ export function proxy(request: NextRequest) {
   const path=request.nextUrl.pathname
 
   const isPathPublic= path==='/login' || path==='/signup'
-  const token=request.cookies.get('token')?.value || ""
+  const token=request.cookies.get('accessToken')?.value || ""
   // console.log("-------------------------------------------------")
   // console.log(isPathPublic)
   const nextAuthToken = request.cookies.get('next-auth.session-token')?.value || request.cookies.get('__Secure-next-auth.session-token')?.value || ""

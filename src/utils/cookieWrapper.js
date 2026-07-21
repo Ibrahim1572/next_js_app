@@ -7,7 +7,7 @@ import { NextResponse} from 'next/server';
 
 const cookieFunction = async() => {
     const cookieStore= await cookies();
-            let tokenCookie=cookieStore.get('token')
+            let tokenCookie=cookieStore.get('accessToken')
             let cookieType="jwt"
             let extractedUserEmail=" "
             let extractedUserName= "  "
