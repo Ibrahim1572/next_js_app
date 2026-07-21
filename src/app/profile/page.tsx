@@ -28,17 +28,17 @@ function Page(){
                     router.push('/profile')
                 }
         setUserData(response.data['User Data'].userData)
-        console.log(response.data['User Data'].userData)
+        // console.log(response.data['User Data'].userData)
         // console.log(userData?.['User Data'].email)
         return response
     }
     // useEffect(function(){
     //     getData()
     // }) 
-    useEffect(function(){
-        console.log(`user data: ${userData}`)
+    // useEffect(function(){
+    //     console.log(`user data: ${userData}`)
 
-    }, [userData])
+    // }, [userData])
 
     const goToSignOut= async()=>{
         router.push("/logout")

@@ -13,7 +13,6 @@ import UpdatePost from './components/updatePost'
 import ViewAllPosts from './components/viewAll'
 import ViewOnePost from './components/viewOne'  
 import ViewArchivedPosts from './components/viewArchivedPosts'
-import cookieFunction from '@/utils/cookieWrapper';
 
 
 
@@ -48,13 +47,9 @@ function Page(){
 
     const customJwtFunc = async() =>{
         const response = await axios.get('api/users/customJwtToken')
-        console.log(`response from page.tsx for jwt route: ${response}`)
+        // console.log(`response from page.tsx for jwt route: ${response}`)
     }
-    useEffect(function() {
-            getGraphData();
-            customJwtFunc()
-            
-        },[]);
+    
 
     const viewAll=async(isDeleted:string)=>{
             setPostData([])
@@ -87,8 +82,10 @@ function Page(){
         }
     }
     useEffect(function() {
-        getAdminCheckData();
-    }, [])
+            // getGraphData();
+            getAdminCheckData();
+            customJwtFunc()  
+        },[]);
 
     
     
