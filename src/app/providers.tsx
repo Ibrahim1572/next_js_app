@@ -10,13 +10,3 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     </SessionProvider>
   );
 }
-
-// export default function Providers({ children }: { children: React.ReactNode }) {
-//   return (
-//     <>
-//       <Toaster />
-//       {children}
-//     </>
-      
-//   );
-// }

@@ -15,13 +15,9 @@ function Page() {
         email: ""
     })
 
-    const assignCustomJwtToken = async() =>{
-        const response = await axios.get('api/users/customJwtToken')
-        console.log(`response from page.tsx: ${response}`)
-    }
-
     useEffect(function() {
         if (session) {
+            // console.log('navigating via useEffect session check')
             router.push('/mediaposts')
         }
     }, [session, router])
@@ -42,6 +38,8 @@ function Page() {
             router.push('/login')
         }
         
+        console.log('navigating via window.location.href')
+        // router.push('/mediaposts')
         window.location.href = '/mediaposts';
 
     }
