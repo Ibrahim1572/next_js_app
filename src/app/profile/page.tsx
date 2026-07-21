@@ -28,30 +28,16 @@ function Page(){
                     router.push('/profile')
                 }
         setUserData(response.data['User Data'].userData)
-        // console.log(response.data['User Data'].userData)
-        // console.log(userData?.['User Data'].email)
         return response
     }
-    // useEffect(function(){
-    //     getData()
-    // }) 
-    // useEffect(function(){
-    //     console.log(`user data: ${userData}`)
-
-    // }, [userData])
 
     const goToSignOut= async()=>{
         router.push("/logout")
     }
-    // const response1 = axios.post("/api/users/profile")
-    // console.log(response1)
 
     const goToMediaPosts= async()=>{
         router.push("/mediaposts")
     }
-    // const response2 = axios.post("/api/users/mediaposts")
-    // console.log(response2)
-    
 
     return (
         <div className="p-8 flex flex-col gap-4 bg-slate-900 min-h-screen text-white">

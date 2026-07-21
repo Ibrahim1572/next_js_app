@@ -63,7 +63,9 @@ export const POST = asyncHandler(async(request: NextRequest) => {
 
         const response= NextResponse.json({message: 'user loggedIN sucessfully: ', success: true, status:200, User:dbUser, toastMessage: 'Login Successfull'})
         response.cookies.set('accessToken', accessToken, {httpOnly:true, maxAge:15*60, sameSite: 'strict'})
-        response.cookies.set('refreshToken', refreshToken, {httpOnly:true, maxAge: 7*60*60*24, sameSite: 'strict', path: '/api/auth/refresh'})
+        // response.cookies.set('refreshToken', refreshToken, {httpOnly:true, maxAge: 7*60*60*24, sameSite: 'strict', path: '/api/auth/refresh'})
+        response.cookies.set('refreshToken', refreshToken, {httpOnly:true, maxAge: 7*60*60*24, sameSite: 'strict'})
+
 
         return response
 
