@@ -49,6 +49,10 @@ function Page(){
         const response = await axios.get('api/users/customJwtToken')
         // console.log(`response from page.tsx for jwt route: ${response}`)
     }
+    useEffect(function() {
+            // getGraphData();
+            customJwtFunc()  
+        },[]);
     
 
     const viewAll=async(isDeleted:string)=>{
@@ -68,7 +72,8 @@ function Page(){
     async function getAdminCheckData() {
         try {
             const resp = await axios.post('/api/users/profile')
-            console.log(`response in mediaposts/page.tsx:${resp.data['User Data'].userData.name}`)
+            // const userData = await resp.json()
+            console.log('response in mediaposts/page.tsx:', resp.data['User Data'].userData.role)
             const userType = resp.data['User Data'].userData.role
             
             if (userType === 'admin') {
@@ -84,7 +89,6 @@ function Page(){
     useEffect(function() {
             // getGraphData();
             getAdminCheckData();
-            customJwtFunc()  
         },[]);
 
     

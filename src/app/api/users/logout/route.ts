@@ -22,7 +22,7 @@ export const POST= ((request :NextRequest)=>{
             path: '/' 
         })
 
-        await RefreshToken.updateMany({userEmail: tokenData.userData.email, isValid: true}, {$set:{isVaid: false}})
+        // await RefreshToken.updateMany({userEmail: tokenData.userData.email, isValid: true}, {$set:{isVaid: false}})
         
         response.cookies.set('next-auth.session-token', "", { 
             httpOnly: true,

@@ -59,7 +59,7 @@ export const POST = asyncHandler(async(request: NextRequest) => {
 
         const newRefreshToken = new RefreshToken({userEmail: dbUser.email, createdAt: dateNow, updatedAt: dateNow, expiresAt: expiryDate, isValid: true, token: refreshToken})
         const savedRefreshToken = await newRefreshToken.save()
-        console.log(`savedRefreshToken route: ${savedRefreshToken}`)
+        // console.log(`savedRefreshToken route: ${savedRefreshToken}`)
 
         const response= NextResponse.json({message: 'user loggedIN sucessfully: ', success: true, status:200, User:dbUser, toastMessage: 'Login Successfull'})
         response.cookies.set('accessToken', accessToken, {httpOnly:true, maxAge:15*60, sameSite: 'strict'})
