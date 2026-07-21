@@ -9,6 +9,20 @@ export const POST= ((request :NextRequest)=>{
             expires: new Date(0),
             path: '/' 
         })
+
+        response.cookies.set('accessToken', "", { 
+            httpOnly: true, 
+            expires: new Date(0),
+            path: '/' 
+        })
+
+        response.cookies.set('refreshToken', "", { 
+            httpOnly: true, 
+            expires: new Date(0),
+            path: '/' 
+        })
+
+        await RefreshToken.updateMany({userEmail: tokenData.userData.email, isValid: true}, {$set:{isVaid: false}})
         
         response.cookies.set('next-auth.session-token', "", { 
             httpOnly: true,

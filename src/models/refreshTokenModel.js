@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const refreshTokenSchema = mongoose.Schema({
     userEmail:{
         required: true,
-        type: Stirng
+        type: String
     },
 
     isValid:{
@@ -26,7 +26,7 @@ const refreshTokenSchema = mongoose.Schema({
         required: true,
         type: Date
     }, 
-    
+
     expiresAt:{
         requred: true,
         type: Date
